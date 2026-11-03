@@ -753,6 +753,87 @@ main{flex:1 0 auto}
   letter-spacing:.01em;color:var(--ink);font-variant-numeric:tabular-nums;
 }
 
+/* ── 照片卡：一张 2.2:1、一张 3:2，各按自己的比例开框，
+      两栏按 1.62 : 1 分，两个框的高度就差不多平 ── */
+.reels--photo{grid-template-columns:minmax(0,1.62fr) minmax(0,1fr)}
+@media (max-width:900px){ .reels--photo{grid-template-columns:minmax(0,1fr)} }
+
+.reel-shot--wide{aspect-ratio:1440/655}
+.reel--photo .reel-shot::before{opacity:.16}
+.reel--photo .reel-spec{margin-top:auto}
+
+.reel-open{
+  position:absolute;inset:0;display:block;width:100%;height:100%;
+  padding:0;border:0;background:var(--paper-2);cursor:zoom-in;
+  -webkit-tap-highlight-color:transparent;
+}
+.reel-open:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.reel-photo{
+  display:block;width:100%;height:100%;object-fit:cover;
+  filter:saturate(.96);
+  transition:transform .8s var(--ease),filter .5s var(--ease);
+}
+@media (hover:hover){
+  .reel:hover .reel-photo{transform:scale(1.014);filter:saturate(1)}
+}
+
+.reel-zoom{
+  position:absolute;left:50%;top:50%;z-index:4;
+  display:inline-flex;align-items:center;gap:7px;padding:5px 10px 4px;
+  background:var(--ink);color:var(--paper);
+  font-family:var(--font-cond);font-size:9px;letter-spacing:.22em;line-height:1;
+  opacity:0;transform:translate(-50%,-50%) scale(.97);pointer-events:none;
+  transition:opacity .26s var(--ease),transform .26s var(--ease);
+}
+.reel-zoom::before{
+  content:"+";font-size:11px;line-height:1;letter-spacing:0;
+  color:var(--accent);margin-top:-1px;
+}
+.reel:hover .reel-zoom,.reel:focus-within .reel-zoom{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* ═══ 看大图 ════════════════════════════════
+   黑屋子：不进主题，照片自己发光。Esc、点背景、点右上角都关。 */
+.lightbox{
+  position:fixed;inset:0;z-index:90;
+  display:flex;align-items:center;justify-content:center;padding:28px;
+  background:rgba(10,14,16,.93);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .24s var(--ease),visibility .24s;
+}
+.lightbox.open{opacity:1;visibility:visible;pointer-events:auto}
+.lb-figure{
+  display:flex;flex-direction:column;gap:10px;margin:0;
+  max-width:100%;transform:scale(.985);transition:transform .24s var(--ease);
+}
+.lightbox.open .lb-figure{transform:none}
+.lb-img{
+  display:block;width:auto;height:auto;
+  max-width:calc(100vw - 56px);max-height:calc(100vh - 96px);
+  border:1px solid rgba(248,250,251,.16);
+  background:#0b0f11;
+}
+.lb-cap{
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(248,250,251,.66);
+}
+.lb-cap::after{
+  content:"";flex:1 1 auto;height:1px;
+  background-image:repeating-linear-gradient(90deg,rgba(248,250,251,.34) 0 2px,transparent 2px 6px);
+}
+.lb-close{
+  position:fixed;top:16px;right:16px;z-index:91;
+  padding:7px 10px 6px;border:1px solid rgba(248,250,251,.26);
+  background:rgba(10,14,16,.4);color:rgba(248,250,251,.9);cursor:pointer;
+  font-family:var(--font-cond);font-size:9px;letter-spacing:.22em;
+  transition:background .2s var(--ease),border-color .2s var(--ease);
+}
+.lb-close:hover{background:rgba(248,250,251,.12);border-color:rgba(248,250,251,.5)}
+@media (max-width:600px){
+  .lightbox{padding:14px}
+  .lb-img{max-width:calc(100vw - 28px);max-height:calc(100vh - 80px)}
+}
+
 /* ═══ 软件板块 ══════════════════════════════
    列表样式留着：条目回来时把 <li> 塞回去就能用。下面那块是空态。 */
 .soft{list-style:none;padding:0;margin:18px 0 0}
@@ -1165,23 +1246,50 @@ a.soft-row:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
       <div class="sec-head">
         <span class="sec-idx">02</span>
         <span class="sec-k">摄像 / CAMERA LOG</span>
-        <i>0 条素材 · 2026</i>
+        <i>2 张 · 2026</i>
       </div>
 
-      <div class="reels reels--empty">
-        <article class="reel reel--empty">
-          <div class="reel-shot">
-            <span class="card-px" aria-hidden="true"></span>
-            <span class="reel-tc">--:--:--</span>
+      <div class="reels reels--photo">
+        <article class="reel reel--photo">
+          <div class="reel-shot reel-shot--wide">
+            <button class="reel-open" type="button" data-full="media/photo-sunline.jpg"
+                    data-cap="金线 / 2026" aria-label="放大查看《金线》">
+              <img class="reel-photo" src="media/photo-sunline.jpg"
+                   alt="落日在水面上拉出一条竖直的金色光柱，一只水鸟从光里游过，尾迹拖出 V 字"
+                   width="1440" height="655" loading="lazy" decoding="async">
+            </button>
+            <span class="reel-zoom" aria-hidden="true">看大图</span>
           </div>
           <div class="reel-body">
-            <div class="reel-top"><span class="reel-no">ROLL 00</span><span class="reel-date">—</span></div>
-            <h3 class="reel-title">还没有素材</h3>
+            <div class="reel-top"><span class="reel-no">FRAME 01</span><span class="reel-date">2026</span></div>
+            <h3 class="reel-title">金线</h3>
+            <p class="reel-desc">太阳贴近水面之后，光被压成一条竖线。一只水鸟从光里游出来，尾迹拖成 V 字，把那条线折了一下。</p>
             <div class="reel-spec">
-              <span><b>—</b>焦段</span>
-              <span><b>—</b>光圈</span>
-              <span><b>—</b>快门</span>
-              <span><b>—</b>ISO</span>
+              <span><b>1440 × 655</b>像素</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="reel reel--photo">
+          <div class="reel-shot">
+            <button class="reel-open" type="button" data-full="media/photo-reflection.jpg"
+                    data-cap="倒影 / 2026.10.10" aria-label="放大查看《倒影》">
+              <img class="reel-photo" src="media/photo-reflection.jpg"
+                   alt="雨点落在水面上，把对岸的楼、树和一块黄色招牌揉成一条条竖纹"
+                   width="1600" height="1067" loading="lazy" decoding="async">
+            </button>
+            <span class="reel-zoom" aria-hidden="true">看大图</span>
+          </div>
+          <div class="reel-body">
+            <div class="reel-top"><span class="reel-no">FRAME 02</span><span class="reel-date">2026.10.10</span></div>
+            <h3 class="reel-title">倒影</h3>
+            <p class="reel-desc">雨点落下来，一圈圈涟漪把对岸的楼、树和那块黄招牌揉成竖纹。每一圈都在重排同一幅画。</p>
+            <div class="reel-spec">
+              <span><b>105</b>毫米</span>
+              <span><b>f/5.6</b>光圈</span>
+              <span><b>1/500</b>快门</span>
+              <span><b>640</b>ISO</span>
+              <span><b>D7100</b>机身</span>
             </div>
           </div>
         </article>
@@ -1267,6 +1375,14 @@ a.soft-row:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 </div>
 
 <div class="scrim" id="scrim"></div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="看大图" aria-hidden="true">
+  <figure class="lb-figure">
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <figcaption class="lb-cap"><span id="lbCap"></span></figcaption>
+  </figure>
+  <button class="lb-close" type="button" id="lbClose">ESC 关闭</button>
+</div>
 
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="artTitle" aria-hidden="true">
   <div class="rprog"><i id="rprogFill"></i></div>
@@ -1694,7 +1810,49 @@ if (wxBtn && wxPanel) {
   });
 }
 
+/* ── 看大图：点帧开、Esc 或点背景关 ── */
+const lb = $('#lightbox');
+const lbImg = $('#lbImg');
+const lbCap = $('#lbCap');
+let lbFrom = null;
+
+const openLb = (btn) => {
+  if (!lb || !lbImg) return;
+  lbFrom = btn;
+  lbImg.src = btn.dataset.full || '';
+  const inner = btn.querySelector('img');
+  lbImg.alt = inner ? inner.alt : '';
+  lbCap.textContent = btn.dataset.cap || '';
+  lb.classList.add('open');
+  lb.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  $('#lbClose').focus({ preventScroll: true });
+};
+
+const closeLb = () => {
+  if (!lb || !lb.classList.contains('open')) return;
+  lb.classList.remove('open');
+  lb.setAttribute('aria-hidden', 'true');
+  document.body.style.overflow = '';
+  if (lbFrom) { lbFrom.focus({ preventScroll: true }); lbFrom = null; }
+};
+
+document.querySelectorAll('.reel-open').forEach((b) => b.addEventListener('click', () => openLb(b)));
+if (lb) {
+  lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
+  const lbBtn = $('#lbClose');
+  if (lbBtn) lbBtn.addEventListener('click', closeLb);
+}
+
 document.addEventListener('keydown', (e) => {
+  /* 黑屋子盖在最上层，Esc 先关它 */
+  if (e.key === 'Escape' && lb && lb.classList.contains('open')) { closeLb(); return; }
+  if (e.key === 'Tab' && lb && lb.classList.contains('open')) {
+    e.preventDefault();
+    $('#lbClose').focus({ preventScroll: true });
+    return;
+  }
+
   if (e.key === 'Escape' && current) { closeDrawer(); return; }
 
   /* Esc 先收二维码面板，再轮到别的 */
