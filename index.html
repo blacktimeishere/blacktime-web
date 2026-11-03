@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="paper">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>请赐给我一个梦 · 手写记录</title>
+<meta name="description" content="一个本地跑的静态博客：我要这颗失控的心继续跳动。">
+<meta name="theme-color" content="#f8fafb">
+<style>
+/* ═══════════════════════════════════════════════════════════
+   今天写点什么？ — 与「今天我们要做什么？」同一套视觉语法
+   零圆角、发丝线、网点底、警戒胶带、分段计量条、像素读数。
+   ═══════════════════════════════════════════════════════════ */
+
+:root{
+  /* 纸面 —— 取自视频里那层接近纯白的纸，冷一档，不是暖白 */
+  --paper:#f8fafb;
+  --paper-2:#eef2f4;
+  --card:#ffffff;
+  --card-hover:#f6f9fa;
+
+  /* 墨阶 — 偏冷的黑，和线稿的墨线同源 */
+  --ink:#111619;
+  --ink-2:#454e54;
+  --ink-3:#616a70;
+  --ink-4:#868f95;
+
+  --line:#dfe5e8;
+  --line-2:#c8d1d6;
+  --line-3:#a7b2b8;
+
+  /* 唯一的高饱和色：绫波丽蓝 */
+  --accent:#3c7898;
+  --accent-deep:#2c5f7b;
+  --accent-pale:#a8c9dc;
+  --accent-wash:rgba(60,120,152,.07);
+  --on-accent:#ffffff;
+  --tape-2:#111619;
+
+  --m-olive:#4c7076;
+  --m-slate:#4f6784;
+  --m-taupe:#6c7078;
+  --m-steel:#3d6472;
+  --m-umber:#5a6a86;
+
+  --ink-rgb:17,22,25;
+  --shadow-rgb:17,22,25;
+  --scrim:rgba(17,22,25,.44);
+
+  --r:0px;
+
+  --ease:cubic-bezier(.22,.75,.24,1);
+  --ease-out:cubic-bezier(.16,.84,.28,1);
+
+  /* 网点 —— 蓝墨打点，整页读起来像一张氰版晒图 */
+  --dot-ink:rgba(44,95,123,.17);
+  --dot-ink-2:rgba(44,95,123,.085);
+  --dot-pitch:8px;
+
+  /* 分段计量条 */
+  --cell:6px;
+  --cell-gap:3px;
+
+  --font-sans:"PingFang SC","HarmonyOS Sans SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"SFMono-Regular","Cascadia Mono","Consolas","Liberation Mono",monospace;
+  --font-cond:"Bahnschrift","Arial Narrow","Roboto Condensed","Impact",sans-serif;
+  --font-jp:"Yu Gothic UI","Yu Gothic","Meiryo","MS Gothic",sans-serif;
+}
+
+/* 夜航 —— 熄灯后的深海，纸变成蓝黑，蓝信号提亮 */
+[data-theme="night"]{
+  --paper:#0d1418;--paper-2:#0a1013;
+  --card:#141c22;--card-hover:#1a242b;
+  --ink:#e6eef2;--ink-2:#aab8c0;--ink-3:#87949c;--ink-4:#63707a;
+  --line:#232e36;--line-2:#2f3d47;--line-3:#41515c;
+  --accent:#8fc3dc;--accent-deep:#b8dcee;--accent-pale:#4a7d99;
+  --accent-wash:rgba(143,195,220,.14);
+  --on-accent:#0b1216;
+  --m-olive:#7fb0ac;--m-slate:#8ba6c4;--m-taupe:#a3a8b4;
+  --m-steel:#7fb3c4;--m-umber:#9caecb;
+  --ink-rgb:230,238,242;--shadow-rgb:0,0,0;--scrim:rgba(0,0,0,.62);
+  --tape-2:#04090c;
+  --dot-ink:rgba(170,210,232,.14);--dot-ink-2:rgba(170,210,232,.055);
+}
+/* 蓝图 —— 晒图纸，比纸白冷三档，蓝线更实 */
+[data-theme="kraft"]{
+  --paper:#dfe9ee;--paper-2:#d2dfe6;
+  --card:#eff5f8;--card-hover:#f8fbfd;
+  --ink:#0c161c;--ink-2:#33474f;--ink-3:#4b5f68;--ink-4:#77888f;
+  --line:#c3d3dc;--line-2:#a8bcc7;--line-3:#8aa1ad;
+  --accent:#2f6885;--accent-deep:#1e4c63;--accent-pale:#8fb6c9;
+  --accent-wash:rgba(47,104,133,.08);
+  --on-accent:#f4fafc;
+  --m-olive:#3f6367;--m-slate:#435c78;--m-taupe:#5f646c;
+  --m-steel:#355c6b;--m-umber:#4d5f7a;
+  --ink-rgb:12,22,28;--shadow-rgb:12,22,28;--scrim:rgba(12,22,28,.46);
+  --tape-2:#0c161c;
+  --dot-ink:rgba(47,104,133,.16);--dot-ink-2:rgba(47,104,133,.08);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--font-sans);font-size:14px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;min-height:100vh;
+  overflow-x:clip;   /* 兜底：任何一层都不该把页面撑出横向滚动 */
+  transition:background .4s var(--ease),color .4s var(--ease);
+}
+body.drawer-open{overflow:hidden}
+::selection{background:var(--accent-pale);color:var(--ink)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,p,dl,dd,dt,ul,figure{margin:0}
+p{text-wrap:pretty}
+
+/* 点阵地面：两层，上层向顶部收拢，让页面像被压在网格纸上 */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(var(--dot-ink-2) 1px,transparent 1.15px);
+  background-size:var(--dot-pitch) var(--dot-pitch);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(var(--dot-ink) 1px,transparent 1.2px);
+  background-size:var(--dot-pitch) var(--dot-pitch);
+  -webkit-mask-image:radial-gradient(120% 80% at 50% 0%,#000 0%,transparent 62%);
+  mask-image:radial-gradient(120% 80% at 50% 0%,#000 0%,transparent 62%);
+  opacity:.42;
+}
+
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+
+.skip{
+  position:fixed;top:10px;left:10px;z-index:200;
+  padding:9px 14px;background:var(--ink);color:var(--paper);
+  font-size:12px;transform:translateY(-200%);transition:transform .2s var(--ease);
+}
+.skip:focus{transform:none}
+
+/* ═══ 页面骨架 ══════════════════════════════ */
+.page{
+  position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 40px;
+  min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;
+}
+main{flex:1 0 auto}
+
+/* 书脊 —— 容器之外的边注，只在宽屏出现 */
+.page::after{
+  content:"ESSAYS  \FF0F  手書きの記録";
+  position:fixed;right:15px;top:50%;transform:translateY(-50%);
+  writing-mode:vertical-rl;
+  font-family:var(--font-jp);font-size:9px;letter-spacing:.44em;
+  color:var(--ink-4);pointer-events:none;z-index:0;
+  padding-right:9px;border-right:1px solid var(--line-2);
+}
+@media (max-width:1399px){ .page::after{display:none} }
+
+/* 警戒胶带 —— 全页唯一饱和的横带 */
+.page::before{
+  content:"";position:fixed;top:0;left:0;right:0;height:4px;z-index:60;pointer-events:none;
+  background-image:repeating-linear-gradient(45deg,var(--accent) 0 4px,var(--tape-2) 4px 8px);
+  animation:tape 1.7s linear infinite;
+}
+@keyframes tape{to{background-position:16px 0}}
+
+/* ═══ 报头 ══════════════════════════════════
+   没有刊头文字，没有方块标记，也没有下面那条虚线：
+   左端只有区块导航，右端是日期与风格开关，整条报头靠留白立住。 */
+.masthead{
+  position:relative;display:flex;align-items:center;justify-content:space-between;
+  gap:24px;height:72px;
+}
+/* 从页面左边缘起跳，图标自身留 6px 内缩，视觉上仍与正文对齐 */
+.mast-nav{display:flex;align-items:center;gap:1px;margin-left:-6px}
+
+.mast-right{display:flex;align-items:center;gap:16px;min-width:0}
+.today{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.1em;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.mast-div{width:1px;height:18px;flex:0 0 auto;background-image:repeating-linear-gradient(180deg,var(--line-2) 0 2px,transparent 2px 5px)}
+
+/* 风格开关 —— 报头右端唯一带字的控件，其余都是像素图标 */
+.style-sw{
+  display:inline-flex;align-items:center;gap:8px;height:32px;
+  padding:0 9px 0 8px;margin-left:2px;
+  border:1px solid var(--line-2);background:var(--card);color:var(--ink-3);
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;line-height:1;
+  transition:border-color .2s var(--ease),background .2s var(--ease),color .2s var(--ease);
+}
+.style-sw:hover{border-color:var(--ink);color:var(--ink);background:var(--card-hover)}
+.style-sw:active{transform:translateY(.5px)}
+.style-sw .sw-label{font-family:var(--font-sans);font-size:10px;letter-spacing:.14em;color:var(--ink-3)}
+.style-sw:hover .sw-label{color:var(--ink-2)}
+.style-sw b{
+  font-family:var(--font-sans);font-weight:700;font-size:11px;
+  letter-spacing:.06em;color:var(--accent);
+}
+.sw-grid{display:grid;grid-template-columns:repeat(2,4px);grid-auto-rows:4px;gap:1.5px}
+.sw-grid i{display:block;background:var(--ink-4);transition:background .3s var(--ease)}
+.sw-grid i:first-child,.sw-grid i:last-child{background:var(--accent)}
+
+/* ═══ 按钮 ══════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:38px;padding:0 14px;
+  border:1px solid transparent;background:transparent;
+  font-size:12.5px;font-weight:500;letter-spacing:.02em;line-height:1.2;white-space:nowrap;
+  transition:background .22s var(--ease),color .22s var(--ease),border-color .22s var(--ease);
+}
+.btn:active{transform:translateY(.5px)}
+.btn-ghost{color:var(--ink-2)}
+.btn-ghost:hover{background:rgba(var(--ink-rgb),.055);color:var(--ink)}
+.btn-outline{color:var(--ink);border-color:var(--line-2);background:var(--card)}
+.btn-outline:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.icon-btn{
+  width:32px;height:32px;display:grid;place-items:center;flex:0 0 auto;
+  border:1px solid transparent;background:transparent;color:var(--ink-2);
+  transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease);
+}
+.icon-btn:hover{background:rgba(var(--ink-rgb),.06);color:var(--ink);border-color:var(--line-2)}
+.ico{width:16px;height:16px;flex:0 0 auto;fill:currentColor;stroke:none;shape-rendering:crispEdges}
+
+:where(.btn,.icon-btn,.style-sw,.else-btn,.chip,.card,input,select,a[data-post]):focus-visible{
+  outline:2px solid var(--ink);outline-offset:2px;
+}
+
+/* ═══ 主视觉 ════════════════════════════════ */
+.hero{
+  position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,392px);
+  grid-template-areas:"copy side" "stats side";
+  column-gap:40px;align-items:start;padding:58px 0 46px;
+}
+.eyebrow{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;
+  color:var(--ink-3);text-transform:uppercase;
+}
+.eyebrow::before{
+  content:"";width:22px;height:3px;flex:0 0 auto;
+  background-image:repeating-linear-gradient(90deg,var(--accent) 0 2px,transparent 2px 4px);
+}
+.eyebrow b{
+  font-family:var(--font-cond);font-weight:600;font-size:10.5px;
+  letter-spacing:.16em;line-height:1;background:var(--ink);color:var(--paper);padding:3px 6px 2px;
+}
+.eyebrow > span{font-family:var(--font-jp);font-size:10px;letter-spacing:.24em;color:var(--ink-2)}
+.eyebrow i{font-style:normal;margin-left:auto;font-size:9px;letter-spacing:.22em;color:var(--ink-4)}
+
+.hero h1{
+  font-family:var(--font-sans);font-weight:900;
+  font-size:clamp(42px,6.6vw,80px);line-height:.96;letter-spacing:-.055em;
+  margin:16px 0 0;
+  -webkit-text-stroke:.55px currentColor;   /* 把中文字重推到真正的黑 */
+}
+.hero h1 span,.hero h1 em{display:block;white-space:nowrap;transform:scaleX(.93);transform-origin:left center}
+.hero h1 em{font-style:normal;font-weight:900;color:var(--accent);margin-top:.02em;letter-spacing:-.05em}
+.hero h1 .print{animation:print .5s steps(6,end) both}
+.hero h1 em.print{animation-delay:.14s}
+@keyframes print{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+.hero-tag{
+  display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin:24px 0 0;
+  color:var(--ink-2);font-family:var(--font-jp);font-size:9.5px;letter-spacing:.34em;
+}
+.hero-tag::before{
+  content:"";width:13px;height:13px;flex:0 0 auto;
+  background-image:repeating-linear-gradient(45deg,var(--accent) 0 2px,transparent 2px 4px);
+}
+.hero-tag b{font-family:var(--font-cond);font-weight:500;font-size:10px;letter-spacing:.18em;color:var(--ink-4)}
+.hero-sub{margin-top:18px;max-width:32em;color:var(--ink-2);font-size:13px;line-height:1.9;letter-spacing:.01em}
+
+/* 半调溶解 —— 五个硬台阶，读起来是位图而不是模糊 */
+.hero-copy{position:relative;grid-area:copy}
+.hero-copy .sub-rule{
+  display:block;height:calc(var(--dot-pitch) * 3.2);margin-top:22px;width:100%;
+  background-image:radial-gradient(var(--dot-ink) 1px,transparent 1.1px);
+  background-size:var(--dot-pitch) var(--dot-pitch);
+  -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 42%,transparent 97%);
+  mask-image:linear-gradient(90deg,#000 0%,#000 42%,transparent 97%);
+}
+
+/* 页首影像 —— 黑白线稿直接印在纸面上，白底靠正片叠底吃掉 */
+.hero-side{grid-area:side;display:flex;flex-direction:column;gap:20px;min-width:0}
+.portrait{position:relative;margin:0}
+.portrait-frame{
+  position:relative;isolation:isolate;
+  aspect-ratio:1/1;overflow:hidden;
+  background:var(--card);border:1px solid var(--line-2);
+}
+.portrait-video{
+  display:block;width:100%;height:100%;
+  object-fit:cover;object-position:50% 42%;
+  mix-blend-mode:multiply;              /* 白底融进纸色，只剩线条 */
+  filter:grayscale(1) contrast(1.03);
+  transition:transform 1.4s var(--ease);
+}
+/* 夜间换成负片：线变白，深色底吃掉黑 */
+[data-theme="night"] .portrait-video{
+  mix-blend-mode:screen;
+  filter:invert(1) grayscale(1) contrast(1.06);
+}
+@media (hover:hover){
+  .portrait:hover .portrait-video{transform:scale(1.022)}
+}
+.portrait .card-px{inset:7px;z-index:2;opacity:1}
+.portrait figcaption{
+  display:flex;align-items:center;gap:9px;margin-top:9px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;
+  color:var(--ink-4);text-transform:uppercase;
+}
+.portrait figcaption::before{
+  content:"";width:16px;height:1px;flex:0 0 auto;background:var(--line-3);
+}
+.portrait figcaption i{font-style:normal;margin-left:auto;color:var(--ink-3)}
+
+/* 读数栏 */
+/* 读数栏 —— 横卧在标题下方，把两栏之间的空隙填满 */
+.stats{
+  grid-area:stats;
+  display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1.98fr);
+  column-gap:24px;margin-top:62px;   /* 让出来的这段空白就是青蛙的地面以上 */
+  /* 这根线现在是「土」：草由雨层画在它上面；滚出首屏、雨层淡掉之后，
+     至少还留下一条虚线撑住结构。 */
+  border-top:1px dotted var(--line-2);
+  padding-top:22px;
+}
+.stat--lead{border-top:0;padding-top:0}
+.stat-k{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.18em;
+  color:var(--ink-3);text-transform:uppercase;
+}
+.stat-k::after{content:"";flex:1 1 auto;height:1px;min-width:12px;background-image:repeating-linear-gradient(90deg,var(--line-3) 0 2px,transparent 2px 6px)}
+.stat--lead strong{
+  display:block;margin-top:8px;
+  font-family:var(--font-cond);font-weight:700;font-size:clamp(38px,4.1vw,54px);
+  line-height:.86;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+}
+.stat--lead strong small{
+  font-family:var(--font-mono);font-size:12px;letter-spacing:0;color:var(--ink-2);
+  margin-left:6px;vertical-align:.55em;
+}
+.stat-row{display:flex;border-left:1px dotted var(--line-2);padding-left:24px}
+.stat{padding:0 14px;border-left:1px dotted var(--line);min-width:0;flex:1 1 0}
+.stat:first-child{border-left:0;padding-left:0}
+.stat strong{
+  display:block;font-family:var(--font-cond);font-weight:700;
+  font-size:clamp(20px,2vw,26px);line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums;
+}
+.stat strong small{font-family:var(--font-mono);font-size:10px;color:var(--ink-3);margin-left:3px;letter-spacing:0}
+.stat > em{
+  display:block;margin-top:6px;font-style:normal;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;
+  color:var(--ink-4);text-transform:uppercase;
+}
+
+/* 点阵条：用亮起的格数表示比例，而不是降透明度 */
+.dm{
+  display:inline-grid;grid-template-columns:repeat(var(--cols,26),var(--dot,4px));
+  grid-auto-rows:var(--dot,4px);gap:var(--gap,1.6px);line-height:0;vertical-align:bottom;
+}
+.dm i{display:block;background:var(--dm-off,rgba(var(--ink-rgb),.075))}
+.dm i.on{background:var(--accent)}
+/* 年份点阵条跟着单元格宽度伸缩，窄屏不会把读数栏撑破 */
+.stat--lead .dm{
+  margin-top:12px;--dot:5.5px;--gap:2.5px;
+  display:grid;width:100%;max-width:220px;
+  grid-template-columns:repeat(var(--cols,26),minmax(0,1fr));
+}
+
+/* ═══ 工具条 ════════════════════════════════ */
+.toolbar{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:14px 0;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line);
+}
+.search{
+  position:relative;display:flex;align-items:center;gap:8px;flex:1 1 220px;max-width:300px;
+  height:34px;padding:0 10px;border:1px solid var(--line-2);background:var(--card);
+  transition:border-color .2s var(--ease);
+}
+.search:focus-within{border-color:var(--ink)}
+.search .ico{width:13px;height:13px;color:var(--ink-3)}
+.search input{
+  flex:1 1 auto;min-width:0;border:0;background:transparent;outline:0;
+  font-size:12.5px;letter-spacing:.01em;
+}
+.search input::placeholder{color:var(--ink-4)}
+.search kbd{
+  font-family:var(--font-mono);font-size:9px;color:var(--ink-4);
+  border:1px solid var(--line-2);padding:0 3px;line-height:1.5;
+}
+.chips{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.chip{
+  display:inline-flex;align-items:center;gap:5px;height:28px;padding:0 10px;
+  border:1px solid var(--line-2);background:transparent;color:var(--ink-2);
+  font-size:11.5px;letter-spacing:.02em;
+  transition:background .2s var(--ease),color .2s var(--ease),border-color .2s var(--ease);
+}
+.chip:hover{border-color:var(--line-3);color:var(--ink)}
+.chip.active{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip .count{font-family:var(--font-mono);font-size:10px;opacity:.55}
+.sort-wrap{margin-left:auto;display:flex;align-items:center;gap:8px}
+.sort-wrap label{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--ink-4);text-transform:uppercase;
+}
+.sort-wrap select{
+  height:30px;padding:0 8px;border:1px solid var(--line-2);background:var(--card);
+  font-size:11.5px;letter-spacing:.02em;appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+  background-position:calc(100% - 13px) 13px,calc(100% - 9px) 13px;
+  background-size:4px 4px,4px 4px;background-repeat:no-repeat;
+  padding-right:24px;
+}
+
+/* ═══ 网格 ══════════════════════════════════ */
+.grid{
+  position:relative;display:grid;grid-template-columns:minmax(0,1fr);
+  gap:14px;padding:26px 0 8px;
+}
+@media (min-width:640px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid > .card:first-child{grid-column:1/-1}
+}
+@media (min-width:1060px){
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .grid > .card:first-child{grid-column:span 2}
+}
+
+.card{
+  --c-ink:color-mix(in srgb,var(--c,var(--accent)) 84%,var(--ink) 16%);
+  position:relative;display:flex;flex-direction:column;gap:12px;
+  min-height:272px;padding:22px 22px 18px;
+  background:var(--card);border:1px solid var(--line);
+  cursor:pointer;overflow:hidden;
+  transition:background .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease);
+  animation:rise .58s steps(9,end) both;
+  animation-delay:calc(var(--i,0) * 46ms);
+}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* 顶部刻度条：hover 时按步长铺满 */
+.card::before{
+  content:"";position:absolute;top:0;left:0;height:3px;width:0;
+  background-image:repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 6px);
+  transition:width .5s var(--ease-out);
+}
+/* 内缩点线框 */
+.card::after{
+  content:"";position:absolute;inset:9px;pointer-events:none;
+  border:1px dotted var(--line-3);opacity:0;transition:opacity .32s var(--ease);
+}
+.card:hover,.card:focus-visible{
+  background:var(--card-hover);border-color:var(--line-3);
+  box-shadow:0 18px 34px -28px rgba(var(--shadow-rgb),.5);
+}
+.card:hover::before,.card:focus-visible::before{width:100%;animation:dashFlow .9s linear infinite}
+.card:hover::after,.card:focus-visible::after{opacity:1}
+@keyframes dashFlow{to{background-position:6px 0}}
+
+/* 注册角标：四角 L 括号，常驻 —— 它是画框，不是交互反馈 */
+.card-px{
+  position:absolute;inset:6px;pointer-events:none;--px-c:var(--line-3);opacity:.9;
+  background-image:
+    linear-gradient(var(--px-c),var(--px-c)),linear-gradient(var(--px-c),var(--px-c)),
+    linear-gradient(var(--px-c),var(--px-c)),linear-gradient(var(--px-c),var(--px-c)),
+    linear-gradient(var(--px-c),var(--px-c)),linear-gradient(var(--px-c),var(--px-c)),
+    linear-gradient(var(--px-c),var(--px-c)),linear-gradient(var(--px-c),var(--px-c));
+  background-size:9px 1px,1px 9px,9px 1px,1px 9px,9px 1px,1px 9px,9px 1px,1px 9px;
+  background-position:left top,left top,right top,right top,left bottom,left bottom,right bottom,right bottom;
+  background-repeat:no-repeat;
+}
+.card:hover .card-px,.card:focus-visible .card-px{--px-c:var(--c-ink)}
+
+/* 主角卡：位置驱动，不绑类名 */
+.grid > .card:first-child::before{
+  width:100%;background-image:repeating-linear-gradient(90deg,var(--accent) 0 3px,transparent 3px 6px);
+}
+.grid > .card:first-child::after{inset:11px;opacity:.62;border-color:var(--line-2)}
+.grid > .card:first-child{padding:26px 26px 20px;border-color:var(--line-2)}
+.grid > .card:first-child .card-px{inset:8px;--px-c:var(--line-2)}
+.grid > .card:first-child .card-title{
+  font-size:clamp(24px,2.3vw,33px);line-height:1.2;letter-spacing:-.042em;font-weight:800;
+  -webkit-text-stroke:.3px currentColor;
+}
+.grid > .card:first-child .card-desc{-webkit-line-clamp:3;min-height:0;font-size:13px}
+
+/* 主角卡变成横排：左边文字，右边读数栏 */
+@media (min-width:640px){
+  .grid > .card:first-child{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) clamp(150px,19vw,208px);
+    grid-template-rows:auto auto auto 1fr auto;
+    column-gap:clamp(26px,3vw,42px);row-gap:12px;align-items:start;
+  }
+  .grid > .card:first-child > .card-top{grid-area:1/1/2/3}
+  .grid > .card:first-child > .card-title{grid-area:2/1/3/2}
+  .grid > .card:first-child > .card-desc{grid-area:3/1/4/2}
+  .grid > .card:first-child > .tags{grid-area:4/1/5/2;align-self:start}
+  .grid > .card:first-child > .card-foot{grid-area:5/1/6/3;margin-top:0;padding-top:13px}
+  .grid > .card:first-child > .progress{
+    grid-area:2/2/4/3;align-self:start;margin-top:0;
+    padding-left:clamp(16px,2.2vw,24px);border-left:1px solid var(--line);gap:10px;
+  }
+  .grid > .card:first-child .progress-meta{flex-direction:column;align-items:flex-start;gap:5px}
+}
+
+.card-top{display:flex;align-items:center;gap:10px}
+.card-top::after{
+  content:"";order:2;flex:1 1 auto;height:1px;min-width:14px;
+  background-image:repeating-linear-gradient(90deg,var(--line-3) 0 2px,transparent 2px 6px);
+  opacity:.75;
+}
+.card-top .cat{order:3}
+.badge{
+  order:1;flex:0 0 auto;display:inline-flex;align-items:center;gap:3px;
+  padding:1px 4px;line-height:1.6;
+  font-family:var(--font-cond);font-size:7.5px;letter-spacing:.14em;
+  background:var(--accent);color:var(--on-accent);opacity:.86;
+}
+.badge::before{content:"";width:3px;height:3px;background:currentColor}
+.card-no{
+  display:inline-flex;align-items:center;gap:7px;
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;
+  color:var(--ink-3);text-transform:uppercase;transition:color .25s var(--ease);
+}
+.card-no i{font-style:normal;color:var(--ink-4);letter-spacing:.04em;margin-left:4px}
+.card-no::before{content:"";width:5px;height:5px;flex:0 0 auto;background:var(--c-ink)}
+.card:hover .card-no{color:var(--accent)}
+.cat{
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--ink-2);
+}
+.cat::before{content:"";width:6px;height:6px;flex:0 0 auto;background:var(--c-ink)}
+
+.card-title{
+  font-size:19px;line-height:1.42;font-weight:700;letter-spacing:-.025em;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card-desc{
+  color:var(--ink-2);font-size:12.5px;line-height:1.8;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:45px;
+}
+.tags{display:flex;flex-wrap:wrap;gap:5px;min-height:22px}
+.tag{
+  display:inline-block;padding:1px 6px;border:1px dotted var(--line-2);
+  color:var(--ink-2);font-size:10.5px;line-height:1.7;letter-spacing:.02em;
+}
+
+.progress{display:flex;flex-direction:column;gap:7px;margin-top:2px}
+.progress-meta{
+  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;
+  color:var(--ink-3);text-transform:uppercase;
+}
+.progress-meta .pct{color:var(--ink);font-size:11.5px;letter-spacing:0;font-variant-numeric:tabular-nums}
+
+/* 像素读数：主角卡的时长用 5×7 点阵画出来，和读数栏同一套模块 */
+.pct--px{line-height:0;display:inline-flex;align-items:flex-end;gap:0}
+.pct--px small{font-size:10px;line-height:1.4;align-self:flex-end;padding-bottom:1px;margin-left:2px;color:var(--ink-3)}
+.pxn{
+  display:inline-grid;grid-template-columns:repeat(5,var(--pd,5px));
+  grid-auto-rows:var(--pd,5px);gap:1px;
+  margin-right:calc(var(--pd,5px) + 3px);
+}
+.pxn i{display:block}
+.pxn i.on{background:var(--ink)}
+.grid > .card:first-child .progress-meta .pct--px{--pd:6px}
+.pm-auto{
+  font-style:normal;margin-left:6px;padding:1px 3px 0;
+  font-family:var(--font-cond);font-size:7.5px;letter-spacing:.12em;
+  background:var(--accent-wash);color:var(--accent);vertical-align:1.5px;
+}
+/* 分段像素计量条 */
+.track{
+  height:var(--cell);
+  background-image:repeating-linear-gradient(90deg,var(--line-2) 0 var(--cell),transparent var(--cell) calc(var(--cell) + var(--cell-gap)));
+}
+.track i{
+  display:block;height:100%;
+  background-image:repeating-linear-gradient(90deg,var(--c-ink) 0 var(--cell),transparent var(--cell) calc(var(--cell) + var(--cell-gap)));
+  transition:width .9s steps(14,end);
+}
+.card-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-top:auto;padding-top:13px;border-top:1px dotted var(--line-2);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--ink-3);
+}
+.due{display:inline-flex;align-items:center;gap:5px;min-width:0}
+.due .ico{width:11px;height:11px}
+
+/* 空态 */
+.empty{
+  grid-column:1/-1;position:relative;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:300px;padding:52px 24px;text-align:center;
+  background:var(--card);border:1px solid var(--line);
+  background-image:radial-gradient(var(--dot-ink-2) 1px,transparent 1.15px);
+  background-size:var(--dot-pitch) var(--dot-pitch);
+}
+.empty::after{content:"";position:absolute;inset:7px;border:1px dotted var(--line-2);pointer-events:none}
+.empty-mark{
+  position:relative;width:58px;height:58px;display:grid;place-items:center;
+  border:1px dotted var(--line-3);background:var(--card);
+  font-size:26px;font-weight:900;color:var(--ink-3);margin-bottom:20px;user-select:none;
+}
+.empty-mark::before{
+  content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:3px;
+  background-image:repeating-linear-gradient(90deg,var(--accent) 0 3px,transparent 3px 6px);
+}
+.empty h3{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.empty p{margin-top:8px;color:var(--ink-3);font-size:12.5px}
+.empty-reset{margin-top:18px;position:relative;z-index:1}
+
+/* ═══ 索引表 ════════════════════════════════ */
+.sec{padding:46px 0 0}
+.sec-head{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--ink)}
+.sec-idx{
+  font-family:var(--font-cond);font-weight:700;font-size:10px;letter-spacing:.1em;
+  background:var(--ink);color:var(--paper);padding:2px 5px 1px;
+}
+.sec-k{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2)}
+.sec-head i{font-style:normal;margin-left:auto;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.14em;color:var(--ink-4)}
+
+.index{list-style:none;padding:0;margin:0}
+.index-empty{
+  margin:0;padding:24px 2px 22px;
+  border-bottom:1px dotted var(--line-3);
+  font-size:12.5px;color:var(--ink-3);letter-spacing:.01em;
+}
+.index-empty b{color:var(--ink-2);font-weight:600}
+.index li{border-bottom:1px dotted var(--line-3)}
+.index a{
+  display:grid;grid-template-columns:66px minmax(0,1fr) auto 86px 74px;
+  align-items:center;gap:14px;padding:13px 2px;
+  transition:background .18s var(--ease),padding-left .18s var(--ease);
+}
+.index a:hover{background:rgba(var(--ink-rgb),.035);padding-left:8px}
+.i-no{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-3)}
+.i-title{font-size:13.5px;font-weight:600;letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.index a:hover .i-title{color:var(--accent)}
+.i-tag{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-4)}
+.i-date{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--ink-3);text-align:right}
+.i-len{font-family:var(--font-mono);font-size:10px;letter-spacing:.04em;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+.year-row{
+  display:flex;align-items:center;gap:10px;padding:20px 0 8px;
+  font-family:var(--font-cond);font-weight:700;font-size:11px;letter-spacing:.18em;color:var(--ink-3);
+}
+.year-row::after{content:"";flex:1 1 auto;height:1px;background-image:repeating-linear-gradient(90deg,var(--line-3) 0 2px,transparent 2px 6px);opacity:.6}
+
+/* ═══ 摄像板块 ══════════════════════════════ */
+.reels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding:22px 0 0}
+@media (max-width:820px){ .reels{grid-template-columns:minmax(0,1fr)} }
+
+.reel{
+  position:relative;display:flex;flex-direction:column;
+  background:var(--card);border:1px solid var(--line);
+  transition:background .3s var(--ease),border-color .3s var(--ease),box-shadow .3s var(--ease);
+}
+.reel:hover,.reel:focus-within{
+  background:var(--card-hover);border-color:var(--line-3);
+  box-shadow:0 18px 34px -30px rgba(var(--shadow-rgb),.5);
+}
+
+/* 取景框：3:2，所有画面共用一层半调网屏，让它们像同一张印刷品 */
+.reel-shot{
+  position:relative;aspect-ratio:3/2;overflow:hidden;
+  background:var(--paper-2);border-bottom:1px solid var(--line);
+}
+.reel-shot > svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.reel-shot::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:2;
+  background-image:radial-gradient(var(--dot-ink-2) .8px,transparent .95px);
+  background-size:4px 4px;opacity:.85;
+}
+.reel-shot .card-px{z-index:3;--px-c:rgba(var(--ink-rgb),.34)}
+.reel:hover .card-px{--px-c:var(--accent)}
+
+/* 空取景框：还没素材时占一个位置，虚线，不当它是可点的卡片 */
+.reels--empty{grid-template-columns:minmax(0,520px)}
+.reel--empty{border-style:dashed;background:var(--card)}
+.reel--empty:hover,.reel--empty:focus-within{
+  background:var(--card);border-color:var(--line);box-shadow:none;
+}
+.reel--empty .reel-shot{background:transparent}
+.reel--empty .reel-shot::before{opacity:.35}
+.reel--empty .reel-shot::after{
+  content:"NO SIGNAL";
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;color:var(--ink-4);
+}
+.reel--empty .reel-title,.reel--empty .reel-desc{color:var(--ink-3)}
+
+.reel-rec{
+  position:absolute;top:9px;left:9px;z-index:4;
+  display:inline-flex;align-items:center;gap:5px;padding:2px 5px 1px;
+  font-family:var(--font-mono);font-size:8.5px;letter-spacing:.2em;
+  background:var(--accent);color:var(--on-accent);
+}
+.reel-rec::before{content:"";width:4px;height:4px;background:currentColor;animation:rec 1.9s steps(2,end) infinite}
+@keyframes rec{50%{opacity:.12}}
+.reel-tc{
+  position:absolute;top:9px;right:9px;z-index:4;
+  padding:2px 5px 1px;font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;
+  background:rgba(var(--ink-rgb),.74);color:var(--paper);
+  font-variant-numeric:tabular-nums;
+}
+.reel-play{
+  position:absolute;left:50%;top:50%;z-index:4;
+  display:inline-flex;align-items:center;gap:7px;padding:5px 10px 4px;
+  background:var(--ink);color:var(--paper);
+  font-family:var(--font-cond);font-size:9px;letter-spacing:.24em;line-height:1;
+  opacity:0;transform:translate(-50%,-50%) scale(.97);pointer-events:none;
+  transition:opacity .26s var(--ease),transform .26s var(--ease);
+}
+.reel-play::before{
+  content:"";width:0;height:0;
+  border-left:7px solid var(--accent);
+  border-top:4.5px solid transparent;border-bottom:4.5px solid transparent;
+}
+.reel:hover .reel-play,.reel:focus-within .reel-play{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+.reel-body{display:flex;flex-direction:column;gap:8px;padding:14px 16px 15px}
+.reel-top{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;
+  color:var(--ink-4);text-transform:uppercase;
+}
+.reel-top::after{
+  content:"";order:2;flex:1 1 auto;height:1px;min-width:12px;
+  background-image:repeating-linear-gradient(90deg,var(--line-3) 0 2px,transparent 2px 6px);
+  opacity:.7;
+}
+.reel-no{order:1;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px}
+.reel-no::before{content:"";width:4px;height:4px;background:var(--accent)}
+.reel-date{order:3;font-variant-numeric:tabular-nums}
+.reel-title{font-size:15.5px;line-height:1.45;font-weight:700;letter-spacing:-.02em}
+.reel-desc{color:var(--ink-2);font-size:12px;line-height:1.8}
+.reel-spec{
+  display:flex;flex-wrap:wrap;align-items:baseline;
+  margin-top:2px;padding-top:10px;border-top:1px dotted var(--line-2);
+}
+.reel-spec span{
+  display:inline-flex;align-items:baseline;gap:4px;
+  padding:0 9px;border-left:1px dotted var(--line-2);
+  font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;
+  color:var(--ink-4);text-transform:uppercase;
+}
+.reel-spec span:first-child{padding-left:0;border-left:0}
+.reel-spec span:last-child{padding-right:0}
+.reel-spec b{
+  font-family:var(--font-cond);font-weight:700;font-size:11.5px;
+  letter-spacing:.01em;color:var(--ink);font-variant-numeric:tabular-nums;
+}
+
+/* ═══ 软件板块 ══════════════════════════════
+   列表样式留着：条目回来时把 <li> 塞回去就能用。下面那块是空态。 */
+.soft{list-style:none;padding:0;margin:18px 0 0}
+.soft li{border-bottom:1px dotted var(--line-3)}
+.soft-row{
+  position:relative;display:grid;
+  grid-template-columns:42px minmax(0,1.55fr) minmax(0,1fr) 88px 62px;
+  align-items:center;gap:14px;padding:14px 2px 14px 0;
+  transition:background .18s var(--ease),padding-left .18s var(--ease);
+}
+.soft-row::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:0;
+  background:var(--accent);transition:width .18s var(--ease);
+}
+.soft-row:hover{background:rgba(var(--ink-rgb),.035);padding-left:10px}
+.soft-row:hover::before{width:2px}
+.s-no{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;color:var(--ink-3)}
+.s-main{min-width:0}
+.s-name{
+  display:block;font-size:13.5px;font-weight:600;letter-spacing:-.01em;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  transition:color .18s var(--ease);
+}
+.soft-row:hover .s-name{color:var(--accent)}
+.s-desc{display:block;margin-top:2px;color:var(--ink-3);font-size:11.5px;line-height:1.6}
+.s-stack{display:flex;flex-wrap:wrap;gap:4px}
+.s-stack span{
+  padding:1px 5px;border:1px dotted var(--line-2);
+  font-family:var(--font-mono);font-size:9.5px;line-height:1.7;color:var(--ink-2);
+}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;padding:2px 7px 1px;
+  font-family:var(--font-cond);font-size:8.5px;letter-spacing:.14em;
+}
+.pill::before{content:"";width:4px;height:4px;background:currentColor}
+.pill-use{background:var(--ink);color:var(--paper)}
+.pill-fix{background:var(--accent-wash);color:var(--accent)}
+.pill-old{border:1px dotted var(--line-2);color:var(--ink-3)}
+.s-sz{
+  justify-self:end;font-family:var(--font-mono);font-size:10px;
+  letter-spacing:.04em;color:var(--ink-3);font-variant-numeric:tabular-nums;
+}
+
+/* 空态：还没有软件时留一行，虚线收边，和摄像那张 NO SIGNAL 是同一套说法 */
+.soft-empty{
+  display:flex;align-items:center;gap:12px;
+  margin-top:18px;padding:20px 16px;
+  border:1px dashed var(--line-2);background:var(--card);
+  background-image:radial-gradient(var(--dot-ink-2) .9px,transparent 1.05px);
+  background-size:5px 5px;
+}
+.sof-tag{
+  font-family:var(--font-cond);font-size:8.5px;letter-spacing:.14em;
+  padding:2px 6px 1px;border:1px dotted var(--line-2);color:var(--ink-3);
+}
+.sof-title{font-size:13px;font-weight:600;letter-spacing:-.005em;color:var(--ink-3)}
+.sof-meta{
+  margin-left:auto;font-family:var(--font-mono);font-size:10px;
+  letter-spacing:.1em;color:var(--ink-4);
+}
+
+@media (max-width:720px){
+  .soft-row{
+    grid-template-columns:34px minmax(0,1fr) auto;
+    grid-template-areas:"no main stat" "no stack sz";
+    row-gap:7px;align-items:start;padding:13px 0;
+  }
+  .soft-row:hover{padding-left:8px}
+  .s-no{grid-area:no;padding-top:2px}
+  .s-main{grid-area:main}
+  .s-stack{grid-area:stack}
+  .s-stat{grid-area:stat;justify-self:end}
+  .s-sz{grid-area:sz;justify-self:end}
+  .s-name{white-space:normal}
+  .reel-spec span{padding:0 7px}
+  .reel-spec b{font-size:11px}
+}
+
+/* ═══ 别处 ══════════════════════════════════
+   两扇门：一个跳外站，一个就地展开二维码。都做成一整块可点的方框，
+   左边那条蓝线在 hover 时从上往下长出来。 */
+.else-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.else-btn{
+  position:relative;display:flex;align-items:center;gap:12px;
+  padding:15px 16px;border:1px solid var(--line-2);background:var(--card);
+  text-align:left;color:var(--ink);text-decoration:none;
+  transition:background .22s var(--ease),border-color .22s var(--ease);
+}
+.else-btn::before{
+  content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:2px;background:var(--accent);
+  transform:scaleY(0);transform-origin:top;transition:transform .22s var(--ease);
+}
+.else-btn:hover,.else-btn[aria-expanded="true"]{border-color:var(--ink);background:var(--card-hover)}
+.else-btn:hover::before,.else-btn[aria-expanded="true"]::before{transform:scaleY(1)}
+.else-btn:active{transform:translateY(.5px)}
+.else-txt{display:flex;flex-direction:column;gap:4px;min-width:0}
+.else-k{font-family:var(--font-mono);font-size:9px;letter-spacing:.22em;color:var(--ink-4)}
+.else-v{
+  font-size:13px;font-weight:600;letter-spacing:-.01em;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.else-go{width:12px;height:12px;margin-left:auto;color:var(--ink-4);transition:color .22s var(--ease)}
+.else-btn:hover .else-go{color:var(--accent)}
+
+/* 二维码：就地展开，不弹层、不挡页面 */
+.wx-panel{display:none;margin-top:12px}
+.wx-panel.open{
+  display:grid;place-items:center;padding:28px 20px;
+  border:1px solid var(--line-2);background:var(--card);
+  background-image:radial-gradient(var(--dot-ink-2) 1px,transparent 1.12px);
+  background-size:var(--dot-pitch) var(--dot-pitch);
+  animation:wxIn .26s var(--ease);
+}
+@keyframes wxIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.wx-card{display:flex;flex-direction:column;align-items:center;gap:14px;margin:0}
+.wx-qr{
+  width:min(260px,66vw);height:auto;display:block;
+  border:1px solid var(--line);background:#fff;padding:10px;
+}
+.wx-cap{
+  margin:0;font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;
+  color:var(--ink-3);text-align:center;
+}
+.wx-cap b{font-family:var(--font-sans);font-weight:600;color:var(--ink);letter-spacing:.02em}
+
+/* ═══ 页脚 ══════════════════════════════════ */
+.foot{
+  margin-top:52px;padding:22px 0 30px;border-top:1px solid var(--line-2);
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;color:var(--ink-3);
+}
+.foot-eof{display:inline-flex;align-items:center;gap:7px}
+.foot-eof .dm{--dot:2.2px;--gap:1px}
+.foot-eof .dm i{background:rgba(var(--ink-rgb),.12)}
+
+/* ═══ 文章抽屉 ══════════════════════════════ */
+.scrim{
+  position:fixed;inset:0;z-index:80;background:var(--scrim);
+  opacity:0;pointer-events:none;transition:opacity .28s var(--ease);
+  backdrop-filter:blur(1.5px);
+}
+.scrim.open{opacity:1;pointer-events:auto}
+
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;z-index:90;
+  width:min(760px,94vw);display:flex;flex-direction:column;
+  background:var(--paper);border-left:1px solid var(--line-2);
+  box-shadow:-30px 0 60px -40px rgba(var(--shadow-rgb),.45);
+  transform:translateX(101%);
+  transition:transform .36s var(--ease),visibility 0s linear .36s;
+  visibility:hidden;
+}
+.drawer.open{transform:none;visibility:visible;transition:transform .36s var(--ease),visibility 0s}
+[hidden]{display:none !important}
+/* 抽屉顶上的分段进度：读到哪里一目了然 */
+.rprog{height:4px;flex:0 0 auto;background-image:repeating-linear-gradient(90deg,var(--line-2) 0 3px,transparent 3px 6px)}
+.rprog i{display:block;height:100%;width:0;background-image:repeating-linear-gradient(90deg,var(--accent) 0 3px,transparent 3px 6px)}
+.drawer-bar{
+  flex:0 0 auto;display:flex;align-items:center;gap:10px;
+  height:60px;padding:0 22px;border-bottom:1px solid var(--line);
+  background:var(--paper);
+}
+.drawer-bar .card-no{flex:0 0 auto}
+.drawer-bar .cat{margin-left:auto}
+.rprog-pct{
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.1em;
+  color:var(--ink-4);font-variant-numeric:tabular-nums;flex:0 0 auto;
+}
+.drawer-scroll{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;padding:34px clamp(22px,5vw,52px) 56px}
+.art-kicker{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;
+  color:var(--ink-3);text-transform:uppercase;
+}
+.art-kicker::before{
+  content:"";width:18px;height:3px;flex:0 0 auto;
+  background-image:repeating-linear-gradient(90deg,var(--accent) 0 2px,transparent 2px 4px);
+}
+.art-title{
+  margin:14px 0 0;font-size:clamp(26px,3.4vw,38px);line-height:1.22;
+  font-weight:900;letter-spacing:-.04em;-webkit-text-stroke:.35px currentColor;
+}
+.art-desc{margin-top:14px;padding-left:13px;border-left:1px solid var(--accent);color:var(--ink-2);font-size:13.5px;line-height:1.85}
+.art-meta{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:20px;padding:10px 0;
+  border-top:1px dotted var(--line-2);border-bottom:1px dotted var(--line-2);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--ink-3);
+}
+.art-meta .sep{width:1px;height:11px;background:var(--line-2)}
+.art-body{margin-top:26px;max-width:34em}
+.art-body p{font-size:15px;line-height:1.95;color:var(--ink);letter-spacing:.005em;margin-bottom:1.15em}
+.art-body p:first-of-type::first-letter{
+  float:left;font-family:var(--font-sans);font-weight:900;font-size:46px;line-height:.86;
+  letter-spacing:-.04em;margin:5px 9px 0 0;color:var(--accent);
+  -webkit-text-stroke:.4px currentColor;
+}
+.art-end{display:flex;align-items:center;gap:10px;margin-top:34px;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.24em;color:var(--ink-4)}
+.art-end::after{content:"";flex:1 1 auto;height:1px;background-image:repeating-linear-gradient(90deg,var(--line-3) 0 2px,transparent 2px 6px)}
+.art-nav{display:flex;gap:8px;margin-top:26px;flex-wrap:wrap}
+.art-nav .btn{flex:1 1 auto;justify-content:flex-start;text-align:left}
+
+/* ═══ ASCII 动效层 ══════════════════════════
+   两个系统：雨线（含草、蛙、苍蝇）/ 解码与光标。
+   全部落在网格纸的既有规则里：等宽、发丝线、单一蓝。
+   ═══════════════════════════════════════════ */
+
+/* 1. 雨线层 —— 只覆盖首屏上半段，底边渐隐，不进入正文 */
+.rain-field{
+  position:fixed;top:0;left:0;width:100%;height:620px;
+  z-index:0;pointer-events:none;display:block;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 64%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 64%,transparent 100%);
+  transition:opacity .2s linear;
+}
+
+/* 2. 光标 —— 句末那颗一直没写完的方块 */
+.caret{
+  display:inline-block;width:.5em;height:1.02em;background:var(--accent);
+  vertical-align:-.16em;margin-left:.34em;
+  animation:blink 1.15s steps(2,end) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* 章节右侧的读数，前面加一道注释斜线 */
+.sec-head i::before{content:"// ";color:var(--line-3)}
+
+/* 页脚时钟 —— 每秒跳一次，证明这一页是活的 */
+.foot-clock{
+  font-variant-numeric:tabular-nums;color:var(--ink-4);
+  letter-spacing:.12em;margin-right:14px;
+}
+
+/* ═══ 响应式 ════════════════════════════════ */
+@media (max-width:1023px){
+  .page{padding:0 28px}
+  .hero{grid-template-columns:minmax(0,1fr);grid-template-areas:"copy" "side" "stats";row-gap:30px;padding:44px 0 36px;align-items:start}
+  .stats{margin-top:0}
+  .hero-side{max-width:520px}
+  .eyebrow i{display:none}
+}
+@media (max-width:720px){
+  .page{padding:0 18px}
+  .masthead{height:60px;padding:0;gap:10px;flex-wrap:nowrap}
+  .mast-right{gap:8px}
+  .today,.mast-div{display:none}
+  .style-sw{padding:0 8px 0 7px;gap:6px}
+  .sw-label{display:none}
+  .hero h1{font-size:clamp(34px,9.4vw,52px)}
+  .hero h1 span,.hero h1 em{transform:none}   /* 手机上不再横向压缩，避免超出 */
+  .portrait{max-width:320px}
+  .toolbar{gap:10px}
+  .search{max-width:none;flex:1 1 100%}
+  .sort-wrap{margin-left:0;width:100%;justify-content:space-between}
+  .index a{grid-template-columns:52px minmax(0,1fr) auto;grid-template-areas:"no title date" "no meta len"}
+  .index a{gap:4px 10px;padding:12px 2px}
+  .i-no{grid-area:no;align-self:start;padding-top:2px}
+  .i-title{grid-area:title;white-space:normal}
+  .i-tag{grid-area:meta;color:var(--ink-4)}
+  .i-date{grid-area:date;align-self:start}
+  .i-len{grid-area:len}
+  .drawer{width:100vw}
+  .drawer-bar{height:56px;padding:0 14px}
+  .drawer-bar .icon-btn{width:44px;height:44px}
+  .drawer-scroll{padding:26px 20px 44px}
+  .art-body p{font-size:14.5px}
+}
+@media (max-width:600px){
+  /* 读数栏回到竖排：窄屏下横向两栏会把「平均篇长」挤到换行 */
+  .stats{grid-template-columns:minmax(0,1fr);margin-top:0}
+  .stat-row{border-left:0;padding-left:0;border-top:1px dotted var(--line);padding-top:12px;margin-top:14px}
+  /* 两扇门在手机上竖着排，整块可点的面积才够 */
+  .else-row{grid-template-columns:minmax(0,1fr);gap:10px}
+}
+@media (max-width:420px){
+  /* 320px 宽时先收两个板块入口，给搜索和风格开关让位 */
+  #camBtn,#softBtn{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none !important;transition-duration:.01ms !important}
+  .page::before{animation:none}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<!-- 雨线 + 青蛙：整页顶部一小块 ASCII 世界，雨落在读数栏那排草上 -->
+<canvas class="rain-field" id="rainField" aria-hidden="true"></canvas>
+
+<div class="page">
+  <header class="masthead">
+    <nav class="mast-nav" aria-label="板块导航">
+      <button class="icon-btn" type="button" id="camBtn" aria-label="跳到摄像板块" title="摄像">
+        <svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path fill-rule="evenodd" d="M2 1h3v1H2V1zM0 2h8v5H0V2zM3 4h2v2H3V4z"/></svg>
+      </button>
+      <button class="icon-btn" type="button" id="softBtn" aria-label="跳到软件板块" title="软件">
+        <svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path d="M2 1h1v1H2V1zM1 2h1v1H1V2zM0 3h1v2H0V3zM1 5h1v1H1V5zM2 6h1v1H2V6zM5 1h1v1H5V1zM6 2h1v1H6V2zM7 3h1v2H7V3zM6 5h1v1H6V5zM5 6h1v1H5V6z"/></svg>
+      </button>
+      <button class="icon-btn" type="button" id="indexBtn" aria-label="跳到索引" title="索引">
+        <svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path d="M0 0h1v8H0V0zm2 0h6v1H2V0zm0 2h4v1H2V2zm0 2h6v1H2V4zm0 2h4v1H2V6z"/></svg>
+      </button>
+    </nav>
+
+    <div class="mast-right">
+      <span class="today" id="todayStamp">—</span>
+      <span class="mast-div" aria-hidden="true"></span>
+      <button class="icon-btn" type="button" id="searchBtn" aria-label="搜索" title="搜索（/）">
+        <svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path d="M1 1h4v1H2v3H1V1zm1 4h1v1H2V5zm2 1h1v1H4V6zm1 1h2v1H5V7zm1-1h1v1H6V6zm0-3h1v3H6V3z"/></svg>
+      </button>
+      <button class="style-sw" type="button" id="themeBtn" title="切换风格（T）">
+        <span class="sw-grid" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="sw-label" aria-hidden="true">风格</span>
+        <b id="themeName">纸白</b>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ── 主视觉 ── -->
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">
+          <b>NO.01</b>
+          <span>私的な記録</span>
+          <span>慢慢写，不定期更新</span>
+          <i id="ebMeta">—</i>
+        </div>
+        <h1>
+          <span class="print">请赐给我</span>
+          <em class="print">一个梦</em>
+        </h1>
+        <p class="hero-tag">
+          <b>DREAM · WALK · FILM · CODE</b>
+        </p>
+        <p class="hero-sub">
+          我要这颗失控的心继续跳动<i class="caret" aria-hidden="true"></i>
+        </p>
+        <span class="sub-rule" aria-hidden="true"></span>
+      </div>
+
+      <div class="hero-side">
+        <!-- 页首影像：黑白线稿，十秒无缝循环 -->
+        <figure class="portrait">
+          <div class="portrait-frame">
+            <video id="portraitVideo" class="portrait-video"
+                   src="media/hero-portrait.mp4"
+                   poster="media/hero-portrait.jpg"
+                   autoplay muted loop playsinline preload="metadata"
+                   aria-label="风吹过短发的线稿，十秒循环"></video>
+            <span class="card-px" aria-hidden="true"></span>
+          </div>
+          <figcaption>
+            <span>FIG.01 · WINDBLOWN</span>
+            <i>10s loop / 1:1</i>
+          </figcaption>
+        </figure>
+      </div>
+
+      <aside class="stats" aria-label="写作统计">
+        <div class="stat stat--lead">
+          <span class="stat-k">已发布 / ESSAYS</span>
+          <strong id="statCount">00<small>篇</small></strong>
+          <span class="dm" id="yearBar" aria-hidden="true"></span>
+        </div>
+        <div class="stat-row">
+          <div class="stat">
+            <strong id="statChars">0<small>字</small></strong>
+            <em>总字数</em>
+          </div>
+          <div class="stat">
+            <strong id="statAvg">0<small>字</small></strong>
+            <em>平均篇长</em>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ── 工具条 ── -->
+    <div class="toolbar">
+      <div class="search">
+        <svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path d="M1 1h4v1H2v3H1V1zm1 4h1v1H2V5zm2 1h1v1H4V6zm1 1h2v1H5V7zm1-1h1v1H6V6zm0-3h1v3H6V3z"/></svg>
+        <label class="sr" for="q">搜索文章</label>
+        <input id="q" type="search" placeholder="搜索标题、摘要、正文…" autocomplete="off">
+        <kbd>/</kbd>
+      </div>
+
+      <div class="chips" id="chips" role="group" aria-label="按分类筛选"></div>
+
+      <div class="sort-wrap">
+        <label for="sort">SORT</label>
+        <select id="sort">
+          <option value="new">最新在前</option>
+          <option value="old">最早在前</option>
+          <option value="long">长篇在前</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ── 文章卡 ── -->
+    <section class="grid" id="grid" aria-label="文章列表"></section>
+
+    <!-- ── 摄像板块 ── -->
+    <section class="sec" id="camera">
+      <div class="sec-head">
+        <span class="sec-idx">02</span>
+        <span class="sec-k">摄像 / CAMERA LOG</span>
+        <i>0 条素材 · 2026</i>
+      </div>
+
+      <div class="reels reels--empty">
+        <article class="reel reel--empty">
+          <div class="reel-shot">
+            <span class="card-px" aria-hidden="true"></span>
+            <span class="reel-tc">--:--:--</span>
+          </div>
+          <div class="reel-body">
+            <div class="reel-top"><span class="reel-no">ROLL 00</span><span class="reel-date">—</span></div>
+            <h3 class="reel-title">还没有素材</h3>
+            <div class="reel-spec">
+              <span><b>—</b>焦段</span>
+              <span><b>—</b>光圈</span>
+              <span><b>—</b>快门</span>
+              <span><b>—</b>ISO</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── 软件板块 ── -->
+    <section class="sec" id="software">
+      <div class="sec-head">
+        <span class="sec-idx">03</span>
+        <span class="sec-k">软件 / SOFTWARE</span>
+        <i>0 个 · 2026</i>
+      </div>
+
+      <div class="soft-empty">
+        <span class="sof-tag">EMPTY</span>
+        <span class="sof-title">还没有软件</span>
+        <span class="sof-meta">0 / 2026</span>
+      </div>
+    </section>
+
+    <!-- ── 索引 ── -->
+    <section class="sec" id="index">
+      <div class="sec-head">
+        <span class="sec-idx">04</span>
+        <span class="sec-k">索引 / INDEX</span>
+        <i id="indexMeta">—</i>
+      </div>
+      <div id="indexBody"></div>
+    </section>
+
+    <!-- ── 别处 ── -->
+    <section class="sec" id="elsewhere">
+      <div class="sec-head">
+        <span class="sec-idx">05</span>
+        <span class="sec-k">别处 / ELSEWHERE</span>
+        <i>2 个去处</i>
+      </div>
+
+      <div class="else-row">
+        <a class="else-btn" href="https://blacktime.lofter.com/" target="_blank" rel="noopener noreferrer">
+          <span class="else-txt">
+            <span class="else-k">LOFTER</span>
+            <span class="else-v">blacktime.lofter.com</span>
+          </span>
+          <svg class="ico else-go" viewBox="0 0 8 8" aria-hidden="true"><path d="M4 0h4v4H7V2H6v1H5v1H4V3h1V2H4V0z"/></svg>
+        </a>
+
+        <button class="else-btn" type="button" id="wxBtn" aria-expanded="false" aria-controls="wxPanel">
+          <span class="else-txt">
+            <span class="else-k">WECHAT</span>
+            <span class="else-v">微信公众号 · 扫码</span>
+          </span>
+          <svg class="ico else-go" viewBox="0 0 8 8" aria-hidden="true"><path d="M0 0h3v3H0V0zm5 0h3v3H5V0zM0 5h3v3H0V5zM4 4h2v1H4V4zM4 5h1v1H4V5zM6 6h1v1H6V6zM4 7h3v1H4V7z"/></svg>
+        </button>
+      </div>
+
+      <div class="wx-panel" id="wxPanel">
+        <figure class="wx-card">
+          <img class="wx-qr" src="media/wechat-qr.jpg" alt="微信公众号二维码" width="430" height="430" decoding="async">
+          <figcaption class="wx-cap"><b>微信扫一扫</b>关注公众号 · 长按图片也能识别</figcaption>
+        </figure>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <span class="foot-eof" aria-hidden="true">
+      <span class="foot-clock" id="footClock">[--:--:--]</span>
+      EOF <span class="dm" id="footDm"></span>
+    </span>
+  </footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="artTitle" aria-hidden="true">
+  <div class="rprog"><i id="rprogFill"></i></div>
+  <div class="drawer-bar">
+    <span class="card-no" id="artNo">NO.—</span>
+    <span class="cat" id="artCat"></span>
+    <span class="rprog-pct" id="rprogPct" aria-hidden="true">00%</span>
+    <button class="icon-btn" type="button" id="closeDrawer" aria-label="关闭文章">
+      <svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path d="M0 0h2v1H1v1H0V0zm6 0h2v2H7V1H6V0zM0 6h1v1h1v1H0V6zm7 0h1v2H6V7h1V6zM2 2h1v1H2V2zm3 0h1v1H5V2zM3 3h2v1H3V3zM2 4h1v1H2V4zm3 0h1v1H5V4z"/></svg>
+    </button>
+  </div>
+  <div class="drawer-scroll" id="drawerScroll">
+    <div class="art-kicker" id="artKicker"></div>
+    <h2 class="art-title" id="artTitle"></h2>
+    <p class="art-desc" id="artDesc"></p>
+    <div class="art-meta" id="artMeta"></div>
+    <div class="art-body" id="artBody"></div>
+    <div class="art-end">END OF FILE</div>
+    <div class="art-nav">
+      <button class="btn btn-outline" type="button" id="prevBtn">← 上一篇</button>
+      <button class="btn btn-outline" type="button" id="backBtn">回到列表</button>
+      <button class="btn btn-outline" type="button" id="nextBtn">下一篇 →</button>
+    </div>
+  </div>
+</aside>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   文章数据 —— 想换成自己的，只改这一块就够了。
+   加一篇：复制一段 { … }, 改 no / date / title / desc / cat / tags / body。
+   no 是编号，date 用 YYYY-MM-DD，body 是段落数组。
+   ═══════════════════════════════════════════════════════════ */
+const POSTS = [
+  /* 上线时这里还是空的。要加一篇，复制下面这段、去掉注释符号：
+  {
+    no: '01',
+    date: '2026-11-01',
+    cat: '生活',            // 摄像 / 软件 / 设计 / 技术 / 生活 / 阅读
+    title: '标题',
+    desc: '一句话摘要，出现在卡片上',
+    tags: ['标签', '标签'],
+    body: ['第一段', '第二段']
+  }
+  */
+];
+
+/* ── 常量 ── */
+const CATS = [
+  { key: 'all', label: '全部' },
+  { key: '摄像', label: '摄像' },
+  { key: '软件', label: '软件' },
+  { key: '设计', label: '设计' },
+  { key: '技术', label: '技术' },
+  { key: '生活', label: '生活' },
+  { key: '阅读', label: '阅读' }
+];
+const CAT_COLOR = {
+  摄像: 'var(--m-steel)',
+  软件: 'var(--m-umber)',
+  设计: 'var(--m-slate)',
+  技术: 'var(--m-olive)',
+  生活: 'var(--m-taupe)',
+  阅读: 'var(--accent)'
+};
+const CHAR_PER_MIN = 400;   /* 中文阅读速度，粗估 */
+
+/* ── 小工具 ── */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const pad2 = (n) => String(n).padStart(2, '0');
+
+/* 中文按字符计数，英文按词计 —— 直接把空白去掉即可，误差可忽略 */
+const countChars = (p) => p.body.join('').replace(/\s/g, '').length;
+const minutesOf = (p) => Math.max(1, Math.round(countChars(p) / CHAR_PER_MIN));
+
+function dateLabel(iso) {
+  const [y, m, d] = iso.split('-');
+  return `${y}.${m}.${d}`;
+}
+function relDays(iso) {
+  const then = new Date(iso + 'T00:00:00');
+  const now = new Date();
+  const diff = Math.floor((now - then) / 86400000);
+  if (diff <= 0) return '今天';
+  if (diff === 1) return '昨天';
+  if (diff < 30) return `${diff} 天前`;
+  if (diff < 365) return `${Math.floor(diff / 30)} 个月前`;
+  return `${Math.floor(diff / 365)} 年前`;
+}
+
+/* 5×7 像素字，只做数字 —— 读数栏用它，比任何字体都更像这台机器 */
+const PXF = {
+  '0': ['01110','10001','10011','10101','11001','10001','01110'],
+  '1': ['00100','01100','00100','00100','00100','00100','01110'],
+  '2': ['01110','10001','00001','00010','00100','01000','11111'],
+  '3': ['11111','00010','00100','00010','00001','10001','01110'],
+  '4': ['00010','00110','01010','10010','11111','00010','00010'],
+  '5': ['11111','10000','11110','00001','00001','10001','01110'],
+  '6': ['00110','01000','10000','11110','10001','10001','01110'],
+  '7': ['11111','00001','00010','00100','01000','01000','01000'],
+  '8': ['01110','10001','10001','01110','10001','10001','01110'],
+  '9': ['01110','10001','10001','01111','00001','00010','01100']
+};
+function pxDigits(str) {
+  return str.split('').map((ch) => {
+    const rows = PXF[ch];
+    if (!rows) return '';
+    const cells = rows.map((row) =>
+      [...row].map((bit) => `<i class="${bit === '1' ? 'on' : ''}"></i>`).join('')
+    ).join('');
+    return `<span class="pxn">${cells}</span>`;
+  }).join('');
+}
+
+/* ── 状态 ── */
+let cat = 'all';
+let query = '';
+let sortBy = 'new';
+let current = null;         /* 当前打开的文章 */
+let qWasEmpty = true;       /* 搜索框上一次是不是空的 */
+const THEMES = ['paper', 'night', 'kraft'];
+const THEME_LABEL = { paper: '纸白', night: '夜航', kraft: '蓝图' };
+
+/* ── 排序 / 筛选 ── */
+function sortedPosts() {
+  const list = POSTS.slice();
+  if (sortBy === 'new') list.sort((a, b) => b.date.localeCompare(a.date));
+  if (sortBy === 'old') list.sort((a, b) => a.date.localeCompare(b.date));
+  if (sortBy === 'long') list.sort((a, b) => countChars(b) - countChars(a));
+  return list;
+}
+function visiblePosts() {
+  const q = query.trim().toLowerCase();
+  return sortedPosts().filter((p) => {
+    if (cat !== 'all' && p.cat !== cat) return false;
+    if (!q) return true;
+    return (p.title + p.desc + p.tags.join('') + p.body.join('')).toLowerCase().includes(q);
+  });
+}
+
+/* ── 渲染：卡片刻度条要用「最长的一篇」做分母 ── */
+const maxChars = Math.max(1, ...POSTS.map(countChars));
+
+function cardHTML(p, i) {
+  const chars = countChars(p);
+  const pct = Math.max(6, Math.round((chars / maxChars) * 100));
+  const isLead = i === 0;
+  const color = CAT_COLOR[p.cat] || 'var(--accent)';
+  return `
+  <article class="card" data-post="${p.no}" tabindex="0" role="button"
+           aria-label="阅读：${p.title}" style="--i:${i};--c:${color}">
+    <span class="card-px" aria-hidden="true"></span>
+    <div class="card-top">
+      ${isLead ? '<span class="badge">LATEST</span>' : ''}
+      <span class="card-no">NO.${p.no} <i>/ ${pad2(POSTS.length)}</i></span>
+      <span class="cat">${p.cat}</span>
+    </div>
+    <h3 class="card-title">${p.title}</h3>
+    <p class="card-desc">${p.desc}</p>
+    <div class="tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join('')}</div>
+    <div class="progress">
+      <div class="progress-meta">
+        <span>篇幅<i class="pm-auto">LEN</i></span>
+        ${isLead
+          ? `<span class="pct pct--px">${pxDigits(String(pct))}<small>%</small></span>`
+          : `<span class="pct">${pct}<small>%</small></span>`}
+      </div>
+      <div class="track"><i style="width:${pct}%"></i></div>
+    </div>
+    <div class="card-foot">
+      <span class="due">
+        <svg class="ico" viewBox="0 0 8 8" aria-hidden="true"><path d="M0 1h1v1H0V1zm1-1h1v1H1V0zm5 0h1v1H6V0zm1 1h1v7H7V1zM0 7h1v1H0V7zm1 1h6v1H1V8zM0 2h8v1H0V2zm1 2h1v1H1V4zm5 0h1v1H6V4z"/></svg>
+        ${dateLabel(p.date)} · ${relDays(p.date)}
+      </span>
+      <span>${chars.toLocaleString('en-US')} 字</span>
+    </div>
+  </article>`;
+}
+
+function emptyHTML() {
+  /* 一篇都没有：别装作是筛没了 */
+  if (!POSTS.length) {
+    return `
+  <div class="empty">
+    <div class="empty-mark" aria-hidden="true">空</div>
+    <h3>还没有发布任何东西</h3>
+    <p>第一篇文章正在写，写完会出现在这里。</p>
+  </div>`;
+  }
+  return `
+  <div class="empty">
+    <div class="empty-mark" aria-hidden="true">空</div>
+    <h3>这个筛选下面还没有文章</h3>
+    <p>换个分类，或者清掉搜索词再看看。</p>
+    <button class="btn btn-outline empty-reset" type="button" data-reset>清空筛选 / RESET</button>
+  </div>`;
+}
+
+function renderGrid() {
+  const grid = $('#grid');
+  const list = visiblePosts();
+  grid.innerHTML = list.length ? list.map(cardHTML).join('') : emptyHTML();
+  grid.setAttribute('aria-busy', 'false');
+}
+
+/* 筛完如果列表已经滚出视口，就把它拉回来——不然换分类像按了没反应 */
+function ensureListVisible() {
+  const top = $('#grid').getBoundingClientRect().top;
+  if (top < -8) window.scrollTo({ top: window.scrollY + top - 92, behavior: 'smooth' });
+}
+
+function resetFilters() {
+  cat = 'all';
+  query = '';
+  qWasEmpty = true;
+  $('#q').value = '';
+  renderChips();
+  renderGrid();
+  ensureListVisible();
+}
+
+function renderChips() {
+  const counts = { all: POSTS.length };
+  POSTS.forEach((p) => { counts[p.cat] = (counts[p.cat] || 0) + 1; });
+  $('#chips').innerHTML = CATS.map((c) => {
+    const n = counts[c.key] || 0;
+    return `<button class="chip${cat === c.key ? ' active' : ''}" type="button"
+              data-cat="${c.key}" aria-pressed="${cat === c.key}">
+              ${c.label}<span class="count">${n}</span></button>`;
+  }).join('');
+}
+
+function renderIndex() {
+  const list = sortedPosts();
+  const byYear = {};
+  list.forEach((p) => { (byYear[p.date.slice(0, 4)] ||= []).push(p); });
+  const years = Object.keys(byYear).sort((a, b) => b.localeCompare(a));
+  $('#indexBody').innerHTML = years.length ? years.map((y) => {
+    const rows = byYear[y].map((p) => `
+      <li>
+        <a href="#post-${p.no}" data-post="${p.no}">
+          <span class="i-no">${p.no}</span>
+          <span class="i-title">${p.title}</span>
+          <span class="i-tag">${p.cat}</span>
+          <span class="i-date">${dateLabel(p.date)}</span>
+          <span class="i-len">${countChars(p)} 字</span>
+        </a>
+      </li>`).join('');
+    return `<div class="year-row">${y} · ${byYear[y].length} 篇</div><ul class="index">${rows}</ul>`;
+  }).join('') : '<p class="index-empty"><b>索引是空的。</b>发第一篇文章之后，这里会按年份排起来。</p>';
+  $('#indexMeta').textContent = list.length ? `${list.length} 条 / ${years.length} 个年份` : '0 条';
+}
+
+function renderStats() {
+  const total = POSTS.length;
+  const chars = POSTS.reduce((s, p) => s + countChars(p), 0);
+  const avgLen = total ? Math.round(chars / total) : 0;
+
+  $('#statCount').innerHTML = `${pad2(total)}<small>篇</small>`;
+  $('#statChars').innerHTML = `${chars.toLocaleString('en-US')}<small>字</small>`;
+  $('#statAvg').innerHTML = `${avgLen}<small>字</small>`;
+
+  /* 今年已过多少 —— 真实的日期进度，不是编出来的数字 */
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  const end = new Date(now.getFullYear() + 1, 0, 1);
+  const passed = Math.min(1, (now - start) / (end - start));
+  const cols = 26, rows = 3, totalCells = cols * rows;
+  const lit = Math.round(passed * totalCells);
+  $('#yearBar').style.setProperty('--cols', cols);
+  $('#yearBar').innerHTML = Array.from({ length: totalCells },
+    (_, i) => `<i class="${i < lit ? 'on' : ''}"></i>`).join('');
+  $('#yearBar').setAttribute('title', `${start.getFullYear()} 年已过 ${Math.round(passed * 100)}%`);
+
+  $('#ebMeta').textContent = `${start.getFullYear()} 已过 ${Math.round(passed * 100)}%`;
+}
+
+function renderStamp() {
+  const d = new Date();
+  const week = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][d.getDay()];
+  $('#todayStamp').textContent =
+    `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}  ${week}`;
+}
+
+/* ── 抽屉 ── */
+function openPost(no) {
+  const p = POSTS.find((x) => x.no === no);
+  if (!p) return;
+  current = p;
+
+  const d = $('#drawer');
+  const color = CAT_COLOR[p.cat] || 'var(--accent)';
+  $('#artNo').textContent = `NO.${p.no}`;
+  $('#artNo').style.setProperty('--c', color);
+  $('#artCat').textContent = p.cat;
+  $('#artCat').style.setProperty('--c', color);
+  $('#artKicker').textContent = `${dateLabel(p.date)}  ·  ${relDays(p.date)}  ·  ${p.tags[0]}`;
+  $('#artTitle').textContent = p.title;
+  $('#artDesc').textContent = p.desc;
+  $('#artMeta').innerHTML = `
+    <span>${dateLabel(p.date)}</span><span class="sep"></span>
+    <span>${countChars(p).toLocaleString('en-US')} 字</span><span class="sep"></span>
+    <span>约 ${minutesOf(p)} 分钟</span><span class="sep"></span>
+    <span>${p.tags.map((t) => '#' + t).join('  ')}</span>`;
+  $('#artBody').innerHTML = p.body.map((t) => `<p>${t}</p>`).join('');
+
+  d.classList.add('open');
+  d.setAttribute('aria-hidden', 'false');
+  $('#scrim').classList.add('open');
+  document.body.classList.add('drawer-open');
+  $('#drawerScroll').scrollTop = 0;
+  $('#rprogFill').style.width = '0%';
+  $('#rprogPct').textContent = '00%';
+  $('#closeDrawer').focus({ preventScroll: true });
+
+  /* 地址栏跟着走：刷新、收藏、后退都能回到这一篇 */
+  try { history.replaceState(null, '', '#post-' + p.no); } catch (err) {}
+
+  /* 上下篇按「最新在前」的顺序走，跟列表看到的一致 */
+  const seq = sortedPosts();
+  const at = seq.findIndex((x) => x.no === p.no);
+  const prev = seq[at - 1];
+  const next = seq[at + 1];
+  $('#prevBtn').hidden = !prev;
+  $('#prevBtn').dataset.prev = prev ? prev.no : '';
+  $('#nextBtn').hidden = !next;
+  $('#nextBtn').dataset.next = next ? next.no : '';
+}
+
+function closeDrawer() {
+  $('#drawer').classList.remove('open');
+  $('#drawer').setAttribute('aria-hidden', 'true');
+  $('#scrim').classList.remove('open');
+  document.body.classList.remove('drawer-open');
+  try {
+    if (location.hash.indexOf('#post-') === 0) {
+      history.replaceState(null, '', location.pathname + location.search);
+    }
+  } catch (err) {}
+  if (current) {
+    const back = $(`#grid .card[data-post="${current.no}"]`) || $(`#index a[data-post="${current.no}"]`);
+    if (back) back.focus({ preventScroll: true });
+  }
+  current = null;
+}
+
+/* 抽屉里的阅读进度 */
+$('#drawerScroll').addEventListener('scroll', (e) => {
+  const el = e.currentTarget;
+  const max = el.scrollHeight - el.clientHeight;
+  const pct = max > 8 ? Math.min(100, Math.max(0, el.scrollTop / max * 100)) : 100;
+  $('#rprogFill').style.width = pct + '%';
+  $('#rprogPct').textContent = pad2(Math.round(pct)) + '%';
+}, { passive: true });
+
+/* ── 事件 ── */
+$('#grid').addEventListener('click', (e) => {
+  if (e.target.closest('[data-reset]')) { resetFilters(); return; }
+  const card = e.target.closest('[data-post]');
+  if (card) openPost(card.dataset.post);
+});
+$('#grid').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const card = e.target.closest('[data-post]');
+  if (!card) return;
+  e.preventDefault();
+  openPost(card.dataset.post);
+});
+$('#indexBody').addEventListener('click', (e) => {
+  const a = e.target.closest('[data-post]');
+  if (a) { e.preventDefault(); openPost(a.dataset.post); }
+});
+
+$('#chips').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-cat]');
+  if (!btn) return;
+  cat = btn.dataset.cat;
+  renderChips();
+  renderGrid();
+  ensureListVisible();
+});
+
+$('#q').addEventListener('input', (e) => {
+  const v = e.target.value;
+  const empty = !v.trim();
+  query = v;
+  renderGrid();
+  /* 只在「从没搜到开始搜」这一刻拉回列表，打字过程中不打断 */
+  if (qWasEmpty && !empty) ensureListVisible();
+  qWasEmpty = empty;
+});
+$('#sort').addEventListener('change', (e) => {
+  sortBy = e.target.value;
+  renderGrid();
+  renderIndex();
+  ensureListVisible();
+});
+
+$('#closeDrawer').addEventListener('click', closeDrawer);
+$('#scrim').addEventListener('click', closeDrawer);
+$('#backBtn').addEventListener('click', closeDrawer);
+$('#prevBtn').addEventListener('click', (e) => {
+  const prev = e.currentTarget.dataset.prev;
+  if (prev) openPost(prev);
+});
+$('#nextBtn').addEventListener('click', (e) => {
+  const next = e.currentTarget.dataset.next;
+  if (next) openPost(next);
+});
+
+/* ── 别处：微信二维码就地展开／收起 ── */
+const wxBtn = $('#wxBtn');
+const wxPanel = $('#wxPanel');
+const setWx = (open) => {
+  if (!wxBtn || !wxPanel) return;
+  wxPanel.classList.toggle('open', open);
+  wxBtn.setAttribute('aria-expanded', String(open));
+};
+if (wxBtn && wxPanel) {
+  wxBtn.addEventListener('click', () => {
+    const open = !wxPanel.classList.contains('open');
+    setWx(open);
+    if (open) wxPanel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    else wxBtn.focus({ preventScroll: true });
+  });
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && current) { closeDrawer(); return; }
+
+  /* Esc 先收二维码面板，再轮到别的 */
+  if (e.key === 'Escape' && wxPanel && wxPanel.classList.contains('open')) {
+    setWx(false);
+    wxBtn.focus({ preventScroll: true });
+    return;
+  }
+
+  /* 抽屉开着时把 Tab 圈在里面，别让焦点跑到背后的网格上 */
+  if (current && e.key === 'Tab') {
+    const f = [...$('#drawer').querySelectorAll('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+      .filter((x) => !x.hidden && x.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0];
+    const last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    return;
+  }
+
+  if (current) return;
+  if (e.key === '/' && document.activeElement !== $('#q')) {
+    e.preventDefault();
+    $('#q').focus();
+    window.scrollTo({ top: $('#q').getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth' });
+    return;
+  }
+  if (e.key === 't' || e.key === 'T') {
+    if (document.activeElement === $('#q')) return;
+    cycleTheme();
+  }
+});
+
+/* ── 配色 ── */
+let themeIdx = 0;
+function applyTheme(name) {
+  document.documentElement.dataset.theme = name;
+  $('#themeBtn').setAttribute('aria-label', `切换风格（当前：${THEME_LABEL[name]}）`);
+  $('#themeBtn').title = `切换风格（T）· 当前：${THEME_LABEL[name]}`;
+  const tn = $('#themeName');
+  if (tn) tn.textContent = THEME_LABEL[name];
+  try { localStorage.setItem('blog-theme', name); } catch (err) {}
+}
+function cycleTheme() {
+  themeIdx = (themeIdx + 1) % THEMES.length;
+  applyTheme(THEMES[themeIdx]);
+}
+$('#themeBtn').addEventListener('click', cycleTheme);
+$('#indexBtn').addEventListener('click', () => {
+  window.scrollTo({ top: $('#index').offsetTop - 90, behavior: 'smooth' });
+});
+$('#camBtn').addEventListener('click', () => {
+  window.scrollTo({ top: $('#camera').offsetTop - 90, behavior: 'smooth' });
+});
+$('#softBtn').addEventListener('click', () => {
+  window.scrollTo({ top: $('#software').offsetTop - 90, behavior: 'smooth' });
+});
+$('#searchBtn').addEventListener('click', () => {
+  $('#q').focus();
+  window.scrollTo({ top: $('#q').getBoundingClientRect().top + window.scrollY - 140, behavior: 'smooth' });
+});
+
+
+/* ═══════════════════════════════════════════════════════════
+   ASCII 动效 —— 雨线 / 解码
+   全部可降级：reduced-motion 下只留静止文本。
+   ═══════════════════════════════════════════════════════════ */
+const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* 1. 雨线：只在页面顶部落雨，两块陆地。
+   第一块是报头下沿（那条虚线已经撤掉，这条线现在只由水花自己描出来），
+   四成雨滴停在那儿；第二块是「已发布」上面那排草，只接住落在它那一段
+   x 上的雨——其余的穿过、淡掉。草行上还养着一只青蛙和一只苍蝇。 */
+function startRain() {
+  const cv = $('#rainField');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  if (!ctx) { cv.remove(); return; }
+
+  const drops = [];
+  const hits = [];
+
+  let W = 0, H = 620, cw = 12, ch = 18, cols = 1;
+  let floorY = 76, fade = 1, running = false, raf = 0, prev = 0;
+
+  /* 两块「陆地」：报头下沿那条无形横线，以及「已发布」上面那根实体横线
+     （.stats 的上边框）。后者只横在左侧文字栏，雨滴落在它的 x 范围内才算着陆。 */
+  let landY = 0, landX0 = 0, landX1 = 0, killY = 0;
+
+  const pal = { ink: '17,22,25', ac: '#3c7898' };
+
+  /* 颜色串按 1% 量化后缓存：雨丝的 alpha 逐格不同，不缓存就是每格拼一次字符串 */
+  let inkCache = {};
+  const inkCss = (a) => {
+    const q = Math.round(a * 100);
+    if (q <= 1) return null;
+    return inkCache[q] || (inkCache[q] = 'rgba(' + pal.ink + ',' + (q / 100) + ')');
+  };
+
+  const readPal = () => {
+    const cs = getComputedStyle(document.documentElement);
+    pal.ink = (cs.getPropertyValue('--ink-rgb') || '').trim() || '17,22,25';
+    pal.ac = (cs.getPropertyValue('--accent') || '').trim() || '#3c7898';
+    inkCache = {};
+  };
+
+  /* 第一条横线的位置：报头下沿。滚动时它会变，所以每帧读一次不值当，交给 scroll 同步 */
+  const lineY = () => {
+    const m = document.querySelector('.masthead');
+    return m ? m.getBoundingClientRect().bottom : 76;
+  };
+
+  /* 「陆地」的位置：读数栏的上边框。滚动时它同样会移动，跟着 sync 一起重测。
+     落在画布外、或被推到太靠底边时就不算陆地，免得雨在看不见的地方停住。 */
+  const refreshLand = () => {
+    const st = document.querySelector('.stats');
+    if (!st) { landY = 0; killY = H * 0.82; return; }
+    const r = st.getBoundingClientRect();
+    landX0 = r.left;
+    landX1 = r.right;
+    landY = r.top > 12 && r.top < H - 26 ? r.top : 0;
+    killY = Math.max(H * 0.82, landY > 0 ? landY + ch * 5 : 0);
+  };
+
+  /* ── 青蛙与苍蝇 ─────────────────────────────
+     陆地不再是一根 1px 横线，而是一排草：青蛙沿草行来回跳，苍蝇在草上方游走，
+     凑到嘴边就吐舌头卷走，再在别处重新出现。
+     所有高度都相对草行计算，青蛙跳到最高也够不到 hero 标题。 */
+  const GRASS = ['^', 'v', ',', '"'];
+  const FLYF = ['\\o/', '~o~'];
+  /* 原稿的蛙：九格宽，坐着三行；腾空时身体张开、四条腿伸出来 */
+  const SPR = {
+    sit:    ['  @..@  ', ' (----) ', '(>____<)'],
+    crouch: ['  @..@  ', ' >____< '],
+    air:    ['  @..@  ', ' (----) ', '(>____<)', ' /|  |\\'],
+    land:   ['  @..@  ', ' >____< ']
+  };
+  const SPR_AX = 4;                       /* 脊梁所在的列 */
+  const R = (a, b) => a + Math.random() * (b - a);
+
+  let fieldC0 = 0, fieldC1 = -1, riseMax = 4, flyMax = 3, grassLine = [];
+  const frog = { x: 0, rise: 0, state: 'idle', t: 0, dur: 2.2 };
+  const fly = { x: 0, rise: 2.2, vx: 0, vr: 0, t: 0 };
+  const tongue = { on: false, ext: 0, ate: false, tx: 0, ty: 1 };
+  let jx0 = 0, jx1 = 0, jh = 3, jT = 0.8;
+  let fClock = 0, blinkAt = 1.8, blinkEnd = 0;
+
+  /* 场地边界：只占读数栏那一段宽度，太窄就不养青蛙 */
+  const measureFrog = () => {
+    const h1 = document.querySelector('.hero h1');
+    if (landY <= 0 || !h1) { fieldC1 = -1; return; }
+    fieldC0 = Math.floor(landX0 / cw) + 2;
+    fieldC1 = Math.floor(landX1 / cw) - 3;
+    if (fieldC1 - fieldC0 < 26) { fieldC1 = -1; return; }
+
+    grassLine = [];
+    for (let i = fieldC0; i <= fieldC1; i++) {
+      const r = Math.random();
+      grassLine.push(r < 0.12 ? '^' : r < 0.30 ? 'v' : r < 0.45 ? ',' : '"');
+    }
+
+    /* 天花板：「2026 已过 xx%」那一行（.eyebrow）的下沿再往下半行。
+       蛙和苍蝇都能跳进标题里，但谁也不许越过这行小字。 */
+    const gy = landY - ch * 0.42;
+    const eb = document.querySelector('.eyebrow');
+    const ceil = (eb ? eb.getBoundingClientRect().bottom : h1.getBoundingClientRect().top) + ch * 0.45;
+    riseMax = Math.floor((gy - ch * 4 - ceil) / ch);   /* 腾空四行高，脚底比草行高一行 */
+    if (riseMax < 2) { fieldC1 = -1; return; }
+    riseMax = Math.min(13, riseMax);
+
+    /* 苍蝇只有一行，上限比蛙再高一行；同一条天花板 */
+    flyMax = Math.floor((gy - ceil) / ch);
+    flyMax = Math.max(3, Math.min(17, flyMax));
+
+    if (!frog.x || frog.x < fieldC0 + 5 || frog.x > fieldC1 - 5) frog.x = (fieldC0 + fieldC1) / 2;
+    if (!fly.x || fly.x < fieldC0 + 2 || fly.x > fieldC1 - 2) fly.x = fieldC0 + 10;
+    fly.rise = Math.min(fly.rise, flyMax);
+  };
+
+  const drawFrog = (dt) => {
+    if (fieldC1 < 0 || landY <= 0) return;
+    const gy = landY - ch * 0.42;          /* 草行的基线，和雨滴溅水的位置同一条 */
+    fClock += dt;
+
+    /* 苍蝇：每 0.28 秒换一次方向，撞到边界弹回来。
+       低处多往上扑，高处就随便飘——这样它会往天花板那边凑，不会一直贴地 */
+    fly.t += dt;
+    if (fly.t > 0.28) {
+      fly.t = 0;
+      fly.vx = R(-9, 9);
+      fly.vr = fly.rise < flyMax * 0.7 ? R(-1.2, 4.4) : R(-4, 4);
+    }
+    fly.x += fly.vx * dt;
+    fly.rise += fly.vr * dt;
+    if (fly.x < fieldC0 + 2) { fly.x = fieldC0 + 2; fly.vx = Math.abs(fly.vx); }
+    if (fly.x > fieldC1 - 2) { fly.x = fieldC1 - 2; fly.vx = -Math.abs(fly.vx); }
+    if (fly.rise < 1.1) { fly.rise = 1.1; fly.vr = Math.abs(fly.vr); }
+    if (fly.rise > flyMax) { fly.rise = flyMax; fly.vr = -Math.abs(fly.vr); }
+
+    frog.t += dt;
+    switch (frog.state) {
+      case 'idle':
+        if (fClock > blinkAt) { blinkEnd = fClock + 0.12; blinkAt = fClock + R(2, 5); }
+        if (frog.t > frog.dur) { frog.state = 'crouch'; frog.t = 0; }
+        break;
+      case 'crouch':
+        if (frog.t > 0.14) {
+          /* 多数时候朝苍蝇的方向跳，偶尔随便蹦一下；高度 4 行起，最多顶到天花板 */
+          let tx = Math.random() < 0.62 ? fly.x + R(-3, 3) : frog.x + R(-16, 16);
+          tx = Math.min(Math.max(tx, fieldC0 + 4), fieldC1 - 4);
+          jx0 = frog.x; jx1 = tx;
+          jh = R(Math.min(4, riseMax), riseMax);
+          jT = R(0.7, 1.05);
+          frog.state = 'air'; frog.t = 0;
+        }
+        break;
+      case 'air': {
+        const p = Math.min(frog.t / jT, 1);
+        frog.x = jx0 + (jx1 - jx0) * p;
+        frog.rise = Math.round(jh * 4 * p * (1 - p));   /* 抛物线，按行取整 */
+        if (p >= 1) { frog.x = jx1; frog.rise = 0; frog.state = 'land'; frog.t = 0; }
+        break;
+      }
+      case 'land':
+        if (frog.t > 0.16) { frog.state = 'idle'; frog.t = 0; frog.dur = R(1.5, 3.4); }
+        break;
+      case 'tongue':
+        if (frog.t < 0.18) tongue.ext = frog.t / 0.18;
+        else if (frog.t < 0.30) tongue.ext = 1;
+        else tongue.ext = Math.max(0, 1 - (frog.t - 0.30) / 0.16);
+        if (tongue.ext >= 1 && !tongue.ate) {
+          tongue.ate = true;
+          let nx, nr, guard = 0;
+          do { nx = R(fieldC0 + 2, fieldC1 - 2); nr = R(1.2, flyMax); }
+          while (Math.abs(nx - frog.x) < 12 && ++guard < 12);
+          fly.x = nx; fly.rise = nr; fly.vx = 0; fly.vr = 0;
+        }
+        if (frog.t > 0.5) {
+          frog.state = 'idle'; frog.t = 0; frog.dur = R(1.2, 2.6);
+          tongue.on = false; tongue.ext = 0; tongue.ate = false;
+        }
+        break;
+    }
+    /* 苍蝇凑到嘴边就动舌头：先把目标位置记下来，
+       吃到之后苍蝇换了地方，舌头也不会跟着瞬移 */
+    if (frog.state === 'idle' && !tongue.on
+        && Math.abs(fly.x - frog.x) <= 9
+        && Math.abs(fly.rise - (frog.rise + 1)) <= 4) {
+      frog.state = 'tongue'; frog.t = 0;
+      tongue.on = true; tongue.ate = false; tongue.ext = 0;
+      tongue.tx = fly.x; tongue.ty = fly.rise;
+    }
+
+    /* ── 画 ── */
+    const baseY = gy - ch - frog.rise * ch;         /* 青蛙脚底那一行 */
+
+    /* 舌头先画，嘴那一头由青蛙盖住。按行号画，整条舌头落在字符网格上 */
+    if (tongue.on && tongue.ext > 0.04) {
+      const mx = Math.round(frog.x), my = 1;               /* 嘴：坐姿底行，草上一行 */
+      const ex = mx + (tongue.tx - mx) * tongue.ext;
+      const ey = my + (tongue.ty - my) * tongue.ext;
+      const n = Math.max(Math.abs(ex - mx), Math.abs(ey - my)) | 0;
+      ctx.fillStyle = pal.ac;
+      ctx.globalAlpha = 0.78;
+      for (let i = 0; i <= n; i++) {
+        const px = Math.round(mx + (ex - mx) * i / Math.max(n, 1));
+        const py = Math.round(my + (ey - my) * i / Math.max(n, 1));
+        if (py < -2 || py > 40) continue;
+        ctx.fillText('~', px * cw + cw / 2, gy - py * ch);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    /* 草 */
+    const gs = inkCss(0.32);
+    if (gs) {
+      ctx.fillStyle = gs;
+      for (let i = fieldC0; i <= fieldC1; i++) {
+        ctx.fillText(grassLine[i - fieldC0], i * cw + cw / 2, gy);
+      }
+    }
+
+    /* 苍蝇：\\o/ 与 ~o~ 两帧交替，落点按行取整，整只在网格上 */
+    const fx = Math.round(fly.x) - 1;
+    const fy = gy - Math.round(fly.rise) * ch;
+    const ff = FLYF[Math.floor(fClock * 8) % 2];
+    ctx.fillStyle = pal.ac;
+    ctx.globalAlpha = 0.88;
+    for (let i = 0; i < ff.length; i++) {
+      ctx.fillText(ff[i], (fx + i) * cw + cw / 2, fy);
+    }
+    ctx.globalAlpha = 1;
+
+    /* 青蛙 */
+    let rows = frog.state === 'crouch' ? SPR.crouch
+             : frog.state === 'land' ? SPR.land
+             : frog.state === 'air' ? SPR.air
+             : SPR.sit;
+    if (fClock < blinkEnd) rows = rows.map((r) => r.replace('@..@', '@--@'));
+    const fs = inkCss(0.66);
+    if (fs) {
+      ctx.fillStyle = fs;
+      const ax = SPR_AX, cx = Math.round(frog.x);
+      for (let r = 0; r < rows.length; r++) {
+        const y = baseY - (rows.length - 1 - r) * ch;
+        for (let i = 0; i < rows[r].length; i++) {
+          const c = rows[r][i];
+          if (c === ' ') continue;
+          ctx.fillText(c, (cx - ax + i) * cw + cw / 2, y);
+        }
+      }
+    }
+  };
+
+  /* 雨滴落在一块陆地上：立住 + 溅一朵水花。陆地上的雨珠活得久一点，
+     才看得出水在横线上积了一层，而不是一闪就没。 */
+  const stopOn = (d, sy, base) => {
+    d.stopped = true;
+    d.sy = sy;
+    d.life = 0;
+    d.ttl = base + Math.random() * 0.42 + d.z * 0.18;
+    hits.push({
+      col: Math.round(d.x / cw), y: sy - ch * 0.42, t: 0,
+      ttl: 0.26 + Math.random() * 0.38 + d.z * 0.16,
+      z: d.z,
+      big: d.z > 0.68
+    });
+    if (hits.length > 120) hits.shift();
+  };
+
+  /* z 是景深：0 最远（细、慢、几乎看不见），1 最近（长、快、实） */
+  const makeDrop = (fromTop) => {
+    const z = Math.random();
+    return {
+      x: Math.random() * W,
+      y: fromTop ? -ch * (1 + Math.random() * 14) : Math.random() * H,
+      z,
+      v: 80 + Math.pow(z, 1.6) * 280 + Math.random() * 30,
+      len: 1 + Math.round(z * 4),
+      g: Math.random(),
+      met: false,
+      metLand: false,
+      stopped: false,
+      sy: 0,
+      life: 0,
+      ttl: 0.2 + Math.random() * 0.46
+    };
+  };
+
+  const seed = () => {
+    drops.length = 0;
+    const n = Math.max(16, Math.min(260, Math.round(cols * 1.8)));
+    for (let i = 0; i < n; i++) drops.push(makeDrop(false));
+  };
+
+  /* 「陆地」（读数栏那条上边框）和右边影像框的底边平齐：
+     量出两者的差值，补进 margin-top。堆叠布局下没有可对齐的邻居，直接还原。 */
+  const alignLand = () => {
+    const stEl = document.querySelector('.stats');
+    const pf = document.querySelector('.portrait-frame');
+    if (!stEl || !pf) return;
+    stEl.style.marginTop = '';
+    if (window.matchMedia('(max-width: 1023px)').matches) return;
+    void stEl.offsetHeight;                     /* 让清掉的行内 margin 先落版 */
+    const base = parseFloat(getComputedStyle(stEl).marginTop) || 0;
+    const diff = pf.getBoundingClientRect().bottom - stEl.getBoundingClientRect().top;
+    if (Math.abs(diff) > 0.5) {
+      stEl.style.marginTop = Math.max(8, base + diff) + 'px';
+    }
+  };
+
+  const measure = () => {
+    alignLand();
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const hero = document.querySelector('.hero');
+    W = window.innerWidth;
+    H = Math.max(240, Math.min(window.innerHeight, hero ? hero.getBoundingClientRect().bottom : window.innerHeight * 0.72));
+    cw = W > 1500 ? 13 : W > 760 ? 12 : 11;
+    ch = Math.round(cw * 1.55);
+    cols = Math.ceil(W / cw) + 1;
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    cv.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.font = '500 ' + Math.round(ch * 0.84) + 'px ui-monospace, "Cascadia Mono", Consolas, monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    floorY = lineY();
+    refreshLand();
+    measureFrog();
+    /* 遮罩的起淡点跟着陆地走：陆地那一条要是不透的，雨落在上面才看得见 */
+    const mp = landY > 0 ? Math.min(92, Math.round((landY / H) * 100) + 10) : 64;
+    const maskCss = 'linear-gradient(180deg,#000 0%,#000 ' + mp + '%,transparent 100%)';
+    cv.style.webkitMaskImage = maskCss;
+    cv.style.maskImage = maskCss;
+    seed();
+  };
+
+  /* 越接近雨区底部越淡，不让雨丝凭空断掉；陆地以上保持原样 */
+  const bottomFade = (y) => {
+    const s = landY > 0 ? landY : H * 0.58;
+    const end = Math.max(s + 90, H * 0.94);
+    return y < s ? 1 : Math.max(0, 1 - (y - s) / (end - s));
+  };
+
+  let windT = 0, wind = 0;
+
+  const draw = (dt) => {
+    ctx.clearRect(0, 0, W, H);
+
+    /* 微风：两个周期不同的正弦叠在一起，雨丝会缓慢地偏一点方向 */
+    windT += dt;
+    wind = Math.sin(windT * 0.21) * 9 + Math.sin(windT * 0.071 + 1.3) * 5;
+
+    /* 先画地面这一场（草、青蛙、苍蝇、舌头），雨丝再落到它上面 */
+    drawFrog(dt);
+
+    for (let i = 0; i < drops.length; i++) {
+      const d = drops[i];
+
+      if (d.stopped) {
+        d.life += dt;
+        if (d.life > d.ttl) { drops[i] = makeDrop(true); continue; }
+      } else {
+        d.y += d.v * dt;
+        d.x += wind * dt * (0.5 + d.z);
+
+        /* 第一块陆地：报头下沿。四成多停住，其余的穿过去、重掷一次运气 */
+        if (!d.met && floorY > 6 && d.y < floorY && d.y + ch * 0.5 >= floorY) {
+          d.met = true;
+          d.y = floorY - ch * 0.5;
+          if (d.g < 0.42) stopOn(d, floorY, 0.22);
+          else d.g = Math.random();
+        }
+        /* 第二块陆地：「已发布」上面那根横线，只在自己那一段 x 上接雨 */
+        else if (!d.metLand && landY > 0 && d.x > landX0 && d.x < landX1
+                 && d.y < landY && d.y + ch * 0.5 >= landY) {
+          d.metLand = true;
+          d.y = landY - ch * 0.5;
+          if (d.g < 0.7) stopOn(d, landY, 0.54);
+        }
+      }
+
+      if (!d.stopped && d.y - d.len * ch > killY) { drops[i] = makeDrop(true); continue; }
+
+      const x = Math.round(d.x / cw) * cw + cw / 2;
+      if (x < -cw || x > W + cw) { drops[i] = makeDrop(true); continue; }
+
+      /* 停在陆地上的那颗：先立着，再压成一滴水 */
+      if (d.stopped) {
+        const st = inkCss(0.3 * (1 - d.life / d.ttl) + 0.06);
+        if (st) {
+          ctx.fillStyle = st;
+          ctx.fillText(d.life < 0.12 ? '|' : "'", x, d.sy - ch * 0.38);
+        }
+        continue;
+      }
+
+      const head = Math.round(d.y / ch);
+      const baseA = 0.09 + d.z * 0.26;
+      for (let k = 0; k < d.len; k++) {
+        const yy = (head - k) * ch + ch / 2;
+        if (yy < -ch || yy > H + ch) continue;
+        const t = 1 - k / d.len;                 /* 头 1 → 尾 0 */
+        const a = baseA * (0.28 + 0.72 * t) * bottomFade(yy) * (k === 0 ? 1.3 : 1);
+        const glyph = k === 0 ? '|' : k === d.len - 1 ? '.' : k === d.len - 2 ? ':' : '|';
+        const st = inkCss(Math.min(0.62, a));
+        if (!st) continue;
+        ctx.fillStyle = st;
+        ctx.fillText(glyph, x, yy);
+      }
+    }
+
+    /* 水花：先是一颗短横，然后向两侧散成两点，最后淡掉 */
+    if (hits.length) {
+      for (let i = hits.length - 1; i >= 0; i--) {
+        const h = hits[i];
+        h.t += dt;
+        const p = h.t / h.ttl;
+        if (p >= 1) { hits.splice(i, 1); continue; }
+        const x = h.col * cw + cw / 2;
+        const y = h.y;
+        ctx.fillStyle = pal.ac;
+        ctx.globalAlpha = 0.62 * (1 - p) * (0.55 + h.z * 0.65);
+        ctx.fillText(p < 0.45 ? (h.big ? '=' : '-') : '.', x, y);
+        if (p > 0.35) {
+          ctx.globalAlpha = 0.34 * (1 - p);
+          ctx.fillText('.', x - cw, y + ch * 0.18);
+          ctx.fillText('.', x + cw, y + ch * 0.18);
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+  };
+
+  const loop = (now) => {
+    if (!running) return;
+    raf = requestAnimationFrame(loop);
+    const dms = now - prev;
+    if (dms < 32) return;
+    const dt = Math.min(0.06, dms / 1000);
+    prev = now;
+    draw(dt);
+  };
+
+  const start = () => {
+    if (running || REDUCE) return;
+    running = true;
+    prev = 0;
+    raf = requestAnimationFrame(loop);
+  };
+  const stop = () => {
+    running = false;
+    cancelAnimationFrame(raf);
+  };
+
+  /* 滚出首屏就淡出并停掉，雨只在顶部这一段存在 */
+  const sync = () => {
+    const y = window.scrollY || window.pageYOffset || 0;
+    floorY = lineY();
+    refreshLand();
+    fade = Math.max(0, 1 - y / (H * 0.85));
+    cv.style.opacity = fade.toFixed(2);
+    if (fade < 0.04) stop(); else start();
+  };
+
+  const boot = () => {
+    measure();
+    readPal();
+    if (REDUCE) { draw(0); return; }
+    sync();
+  };
+
+  boot();
+
+  /* 字体落定后 hero 会变高，重新对一次线；雨区差得多了再重算一次 */
+  window.addEventListener('load', () => {
+    alignLand();
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+    const nb = Math.min(window.innerHeight, hero.getBoundingClientRect().bottom);
+    if (Math.abs(nb - H) > 24) { stop(); measure(); sync(); }
+  });
+
+  let rt = 0, st = 0;
+  window.addEventListener('resize', () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => { stop(); boot(); }, 220);
+  });
+  /* 换主题时墨色与蓝要跟着换，不然夜航下还是黑雨 */
+  if (window.MutationObserver) {
+    new MutationObserver(readPal).observe(document.documentElement, {
+      attributes: true, attributeFilter: ['data-theme']
+    });
+  }
+  window.addEventListener('scroll', () => {
+    if (st) return;
+    st = requestAnimationFrame(() => { st = 0; sync(); });
+  }, { passive: true });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) stop(); else sync();
+  });
+}
+
+/* 2. 解码：进视口时，英数从乱码逐位收敛成原文 */
+const GLYPH = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#*/<>+[]';
+function scramble(el, frames = 8) {
+  if (REDUCE || el.dataset.sc) return;
+  el.dataset.sc = '1';
+  const final = el.textContent;
+  let f = 0;
+  const timer = setInterval(() => {
+    f++;
+    const keep = Math.floor(final.length * (f / frames));
+    el.textContent = Array.from(final, (ch, i) =>
+      (i < keep || !/[A-Za-z0-9]/.test(ch))
+        ? ch
+        : GLYPH[(Math.random() * GLYPH.length) | 0]
+    ).join('');
+    if (f >= frames) { clearInterval(timer); el.textContent = final; }
+  }, 40);
+}
+
+function watchScramble() {
+  const els = document.querySelectorAll('.sec-k, .hero-tag b');
+  if (!els.length || REDUCE) return;
+  if (!('IntersectionObserver' in window)) { els.forEach((el) => scramble(el)); return; }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      scramble(e.target);
+    });
+  }, { threshold: .6 });
+  els.forEach((el) => io.observe(el));
+}
+
+/* 3. 页脚时钟 —— 每秒跳一次，证明这一页是活的 */
+function tickClock() {
+  const el = $('#footClock');
+  if (!el) return;
+  const d = new Date();
+  el.textContent = `[${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}]`;
+}
+
+/* ── 启动 ── */
+(function boot() {
+  try {
+    const saved = localStorage.getItem('blog-theme');
+    if (saved && THEMES.includes(saved)) themeIdx = THEMES.indexOf(saved);
+  } catch (err) {}
+  applyTheme(THEMES[themeIdx]);
+
+  renderStamp();
+  renderStats();
+  renderChips();
+  renderGrid();
+  renderIndex();
+
+  /* ASCII 动效层 */
+  startRain();
+  watchScramble();
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  /* 页首影像：减少动效偏好时停在封面帧；切到后台也停，别偷跑流量和电 */
+  const pv = $('#portraitVideo');
+  if (pv) {
+    if (REDUCE) { pv.autoplay = false; pv.pause(); }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) pv.pause();
+      else if (!REDUCE) pv.play().catch(() => {});
+    });
+  }
+
+  /* EOF 点阵：一小段固定图样，纯装饰但和读数栏同源 */
+  const eof = [1,1,0,1,1,0,1,1,0,0,1,1];
+  $('#footDm').style.setProperty('--cols', 12);
+  $('#footDm').innerHTML = eof.map((b) => `<i class="${b ? 'on' : ''}"></i>`).join('');
+
+  /* 带 #post-09 这样的锚点进来，直接打开那一篇 */
+  const m = location.hash.match(/^#post-(.+)$/);
+  if (m && POSTS.some((p) => p.no === m[1])) openPost(m[1]);
+})();
+</script>
+</body>
+</html>
