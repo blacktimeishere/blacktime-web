@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>刷脂实验室 · 一屏记完你的减脂数据</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:#f4f6fb;color:#1a2238;line-height:1.9;-webkit-font-smoothing:antialiased;
+  }
+  .page{max-width:760px;margin:0 auto;background:#fff;padding:44px 40px 60px;box-shadow:0 10px 40px rgba(20,40,90,.08)}
+  @media(max-width:640px){.page{padding:26px 20px 40px}}
+  .kicker{font-size:12px;letter-spacing:2px;color:#4d7fff;font-weight:700;margin-bottom:14px}
+  h1{font-size:30px;line-height:1.4;letter-spacing:.5px;margin-bottom:18px}
+  @media(max-width:640px){h1{font-size:24px}}
+  .lead{font-size:16px;color:#3d4a68;margin-bottom:26px}
+  h2{font-size:20px;margin:38px 0 14px;padding-left:12px;border-left:4px solid #4d7fff;line-height:1.5}
+  p{margin-bottom:16px;font-size:16px;color:#2b3550}
+  strong{color:#0b1633}
+  .quote{
+    background:#f0f4ff;border-left:4px solid #b9cdff;padding:16px 20px;border-radius:0 8px 8px 0;
+    color:#3a4a72;font-size:15px;margin:22px 0;
+  }
+  ol,ul{margin:0 0 18px 22px}
+  li{margin-bottom:10px;font-size:16px;color:#2b3550}
+  .cards{display:grid;gap:14px;margin:22px 0}
+  .feature{background:#f8faff;border:1px solid #e3eaff;border-radius:12px;padding:18px 20px}
+  .feature b{display:block;font-size:16px;color:#0b1633;margin-bottom:6px}
+  .feature span{font-size:14.5px;color:#4a5675}
+  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:15px}
+  th,td{padding:10px 12px;border-bottom:1px solid #e8edf8;text-align:left}
+  th{color:#6a7899;font-weight:600;font-size:13px;letter-spacing:.5px}
+  .dark{
+    background:linear-gradient(160deg,#001a54,#000a26);color:#eaf0ff;border-radius:16px;
+    padding:28px 26px;margin:34px 0;
+  }
+  .dark h2{border-left-color:#4d7fff;color:#fff;margin-top:0}
+  .dl-group{margin-top:20px}
+  .dl-group h3{font-size:15px;color:#9ec1ff;font-weight:600;margin-bottom:10px;letter-spacing:.5px}
+  .links{display:grid;gap:10px}
+  @media(min-width:560px){.links{grid-template-columns:1fr 1fr 1fr}}
+  .links a{
+    display:block;text-align:center;text-decoration:none;padding:13px 10px;border-radius:10px;
+    font-size:14.5px;font-weight:600;background:#4d7fff;color:#fff;
+  }
+  .links a.short{background:rgba(255,255,255,.1);border:1px solid rgba(234,240,255,.3);color:#eaf0ff;font-weight:500}
+  .links .off{
+    display:block;text-align:center;padding:13px 10px;border-radius:10px;font-size:13.5px;
+    background:rgba(255,255,255,.04);border:1px dashed rgba(234,240,255,.2);color:#7d8db8;
+  }
+  .tip{font-size:13px;color:#8fa4d4;margin-top:14px;line-height:1.8}
+  .foot{margin-top:36px;padding-top:18px;border-top:1px solid #e8edf8;font-size:13px;color:#8a94ad;line-height:1.9}
+  .badge{display:inline-block;background:#eaf1ff;color:#2a5bff;font-size:12px;padding:3px 10px;border-radius:999px;margin-right:6px;margin-bottom:6px}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="kicker">自用工具 · 免费 · 离线</div>
+  <h1>减脂这件事，最难的不是坚持，是「记录」</h1>
+
+  <p class="lead">
+    先问个扎心的问题：你上一次减脂，数据记在哪？体重在体重秤 App，训练在健身 App，
+    吃了什么在备忘录，进度照在相册，打卡在微信群。三天后放弃记录，两周后放弃减脂。
+    不是你不自律，是记录这件事太碎了。
+  </p>
+
+  <p>
+    我做了一个小工具，叫「<strong>刷脂实验室</strong>」。它只解决一件事：
+    <strong>让你愿意一直记下去。</strong>
+  </p>
+
+  <h2>它长什么样</h2>
+  <p>
+    打开就是一块可以自由拖拽的看板：「减脂目标 / 12 周」「每日清单」「备注」「阶段体重」……
+    想放几张卡片放几张，卡片之间还能拉线连起来——目标连着清单，清单连着数据，一条线就把逻辑讲清楚了。
+  </p>
+  <div class="quote">
+    不是填表式的死板界面，是<strong>你自己搭出来的一屏</strong>。看得见，才坚持得下去。
+  </div>
+
+  <h2>三个真正用得上的功能</h2>
+  <div class="cards">
+    <div class="feature">
+      <b>1｜训练记录，一天一格，不打字</b>
+      <span>卧推 4×12、深蹲 4×10、哑铃划船 4×12——点一下就记完，顶部进度条实时显示今天完成了多少组。练完看一眼「4 / 8 组完成，50%」，比任何鸡汤都提神。</span>
+    </div>
+    <div class="feature">
+      <b>2｜进展照片，直接拖进去</b>
+      <span>不用来回切相册。把照片从桌面拖进看板卡片即可，前后对比一目了然；安卓版直接从系统相册多选导入。</span>
+    </div>
+    <div class="feature">
+      <b>3｜六套配色，晚上看不瞎眼</b>
+      <span>克莱因忧郁、午夜深蓝、白噪反相、静电黑、脉冲电蓝、灰蓝雾。默认深色，睡前记录不刺眼；白天切浅色，截图发朋友圈也好看。</span>
+    </div>
+  </div>
+
+  <h2>三个平台，界面一模一样</h2>
+  <table>
+    <tr><th>平台</th><th>文件</th><th>大小</th><th>说明</th></tr>
+    <tr><td>安卓</td><td>APK</td><td>142 KB</td><td>装上是桌面 App，和原生一样</td></tr>
+    <tr><td>Windows</td><td>安装包</td><td>791 KB</td><td>有安装向导，可自选安装位置</td></tr>
+    <tr><td>网页</td><td>HTML</td><td>75 KB</td><td>双击就能打开，不用装</td></tr>
+  </table>
+  <p>关键是：<strong>它们不是三个软件，是同一个界面。</strong>电脑上记，手机上看，操作习惯完全一致。</p>
+
+  <h2>三件我坚持不做的事</h2>
+  <ol>
+    <li><strong>不联网。</strong>所有版本本地运行，程序里对外的请求全部拦死（安卓版非本地请求直接返回 403）。</li>
+    <li><strong>不要账号。</strong>不用注册、不用登录、不用手机号。</li>
+    <li><strong>不收钱、不加广告。</strong>就一个单机小工具。</li>
+  </ol>
+  <p>你的体重、体脂、训练记录、进展照片，全都在你自己的设备里。备份就是复制一个文件夹。</p>
+
+  <h2>说句实在的</h2>
+  <p>
+    它不是万能药，不会替你少吃一口饭，也不会自动长肌肉。它只是把「记录」这件事的成本，
+    从 5 分钟降到 5 秒——剩下的还是得靠你自己。
+  </p>
+  <p>如果你正在减脂，或者身边有人正在减脂，拿去吧。</p>
+
+  <div class="dark">
+    <h2>下载</h2>
+    <p style="color:#b9c6e6;font-size:15px">三个网盘任选一个，随便哪个都能下。</p>
+
+    <div class="dl-group">
+      <h3>安卓版 APK · 142 KB · Android 6.0+</h3>
+      <div class="links">
+        <a class="short" href="https://pan.baidu.com/s/11z8BtR6bxUjkFgYq1tYONw?pwd=eef9" target="_blank" rel="noopener">百度网盘 · 提取码 eef9</a>
+        <a class="short" href="https://pan.quark.cn/s/86cff6bd5b6b" target="_blank" rel="noopener">夸克网盘</a>
+        <span class="off">阿里云盘 · 待补</span>
+      </div>
+    </div>
+
+    <div class="dl-group">
+      <h3>Windows 安装包 · 791 KB · Win10 / 11</h3>
+      <div class="links">
+        <a href="https://www.alipan.com/s/Lwkq1PSXkkW" target="_blank" rel="noopener">阿里云盘</a>
+        <a class="short" href="https://pan.baidu.com/s/12f-7-ZcYWjhliQBovdHG2g?pwd=dgxn" target="_blank" rel="noopener">百度网盘 · 提取码 dgxn</a>
+        <a class="short" href="https://pan.quark.cn/s/5cf427f1fbc2" target="_blank" rel="noopener">夸克网盘</a>
+      </div>
+    </div>
+
+    <p class="tip">
+      安卓安装提示：下载后点开 APK，首次会提示「未知来源」，按提示允许一次即可。<br>
+      电脑安装提示：双击安装包，一路下一步，默认装到 D 盘，不占 C 盘空间。<br>
+      百度网盘的提取码已写在按钮上（eef9 / dgxn），链接里也带了，点开一般会自动填好。
+    </p>
+  </div>
+
+  <p style="margin-top:26px">
+    <span class="badge">离线运行</span><span class="badge">无广告</span>
+    <span class="badge">不要账号</span><span class="badge">数据在本地</span>
+    <span class="badge">三端同步手感</span>
+  </p>
+
+  <div class="foot">
+    刷脂实验室 v1.0.0 · 个人免费使用 · 数据保存在你自己的设备里<br>
+    下载链接失效时请留言，我会重新分享。
+  </div>
+
+</div>
+</body>
+</html>

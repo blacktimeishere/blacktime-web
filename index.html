@@ -796,7 +796,7 @@ main{flex:1 0 auto}
   letter-spacing:.04em;color:var(--ink-3);font-variant-numeric:tabular-nums;
 }
 
-/* 空态：还没有软件时留一行，虚线收边，和摄像那张 NO SIGNAL 是同一套说法 */
+/* 空态：列表清空时留一行，虚线收边，和摄像那张 NO SIGNAL 是同一套说法 */
 .soft-empty{
   display:flex;align-items:center;gap:12px;
   margin-top:18px;padding:20px 16px;
@@ -813,6 +813,12 @@ main{flex:1 0 auto}
   margin-left:auto;font-family:var(--font-mono);font-size:10px;
   letter-spacing:.1em;color:var(--ink-4);
 }
+
+/* 整行可点：条目就是一个链接，右边写着「打开 ↗」 */
+a.soft-row{text-decoration:none;color:inherit}
+a.soft-row .s-sz{transition:color .18s var(--ease)}
+a.soft-row:hover .s-sz{color:var(--accent)}
+a.soft-row:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 
 @media (max-width:720px){
   .soft-row{
@@ -1187,14 +1193,23 @@ main{flex:1 0 auto}
       <div class="sec-head">
         <span class="sec-idx">03</span>
         <span class="sec-k">软件 / SOFTWARE</span>
-        <i>0 个 · 2026</i>
+        <i>1 个 · 2026</i>
       </div>
 
-      <div class="soft-empty">
-        <span class="sof-tag">EMPTY</span>
-        <span class="sof-title">还没有软件</span>
-        <span class="sof-meta">0 / 2026</span>
-      </div>
+      <ul class="soft">
+        <li>
+          <a class="soft-row" href="apps/shuazhi-lab.html" target="_blank" rel="noopener">
+            <span class="s-no">01</span>
+            <span class="s-main">
+              <span class="s-name">刷脂实验室</span>
+              <span class="s-desc">一屏记完减脂数据的离线看板：训练、体重、进展照片。</span>
+            </span>
+            <span class="s-stack"><span>HTML</span><span>离线</span></span>
+            <span class="s-stat"><span class="pill pill-fix">免费</span></span>
+            <span class="s-sz">打开 ↗</span>
+          </a>
+        </li>
+      </ul>
     </section>
 
     <!-- ── 索引 ── -->
