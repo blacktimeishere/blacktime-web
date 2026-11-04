@@ -2,165 +2,306 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>刷脂实验室 · 一屏记完你的减脂数据</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141516">
+<title>刷脂实验室 · 下载</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-    background:#f4f6fb;color:#1a2238;line-height:1.9;-webkit-font-smoothing:antialiased;
+  :root {
+    --bg: #141516;
+    --bg2: #1A1B1D;
+    --card: #202124;
+    --card2: #26282B;
+    --text: #ECEEF0;
+    --dim: #8B8F94;
+    --accent: #FF7A3D;
+    --accent-fg: #14100C;
+    --line: rgba(236,238,240,.14);
+    --line-strong: rgba(236,238,240,.4);
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+    --sans: "Helvetica Neue", "Segoe UI Variable Display", -apple-system, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    --serif: "Songti SC", "Noto Serif CJK SC", "SimSun", Georgia, serif;
   }
-  .page{max-width:760px;margin:0 auto;background:#fff;padding:44px 40px 60px;box-shadow:0 10px 40px rgba(20,40,90,.08)}
-  @media(max-width:640px){.page{padding:26px 20px 40px}}
-  .kicker{font-size:12px;letter-spacing:2px;color:#4d7fff;font-weight:700;margin-bottom:14px}
-  h1{font-size:30px;line-height:1.4;letter-spacing:.5px;margin-bottom:18px}
-  @media(max-width:640px){h1{font-size:24px}}
-  .lead{font-size:16px;color:#3d4a68;margin-bottom:26px}
-  h2{font-size:20px;margin:38px 0 14px;padding-left:12px;border-left:4px solid #4d7fff;line-height:1.5}
-  p{margin-bottom:16px;font-size:16px;color:#2b3550}
-  strong{color:#0b1633}
-  .quote{
-    background:#f0f4ff;border-left:4px solid #b9cdff;padding:16px 20px;border-radius:0 8px 8px 0;
-    color:#3a4a72;font-size:15px;margin:22px 0;
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
-  ol,ul{margin:0 0 18px 22px}
-  li{margin-bottom:10px;font-size:16px;color:#2b3550}
-  .cards{display:grid;gap:14px;margin:22px 0}
-  .feature{background:#f8faff;border:1px solid #e3eaff;border-radius:12px;padding:18px 20px}
-  .feature b{display:block;font-size:16px;color:#0b1633;margin-bottom:6px}
-  .feature span{font-size:14.5px;color:#4a5675}
-  table{width:100%;border-collapse:collapse;margin:18px 0;font-size:15px}
-  th,td{padding:10px 12px;border-bottom:1px solid #e8edf8;text-align:left}
-  th{color:#6a7899;font-weight:600;font-size:13px;letter-spacing:.5px}
-  .dark{
-    background:linear-gradient(160deg,#001a54,#000a26);color:#eaf0ff;border-radius:16px;
-    padding:28px 26px;margin:34px 0;
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 22px 60px; }
+
+  /* ---------- 顶部：海面 ---------- */
+  .hero { position: relative; height: 300px; margin: 0 -22px 26px; overflow: hidden; }
+  #sea { display: block; width: 100%; height: 100%; }
+  .hero-txt { position: absolute; left: 22px; right: 22px; top: 34px; z-index: 2; }
+  .kicker {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: 3.6px;
+    color: var(--dim); text-transform: uppercase; margin-bottom: 14px;
   }
-  .dark h2{border-left-color:#4d7fff;color:#fff;margin-top:0}
-  .dl-group{margin-top:20px}
-  .dl-group h3{font-size:15px;color:#9ec1ff;font-weight:600;margin-bottom:10px;letter-spacing:.5px}
-  .links{display:grid;gap:10px}
-  @media(min-width:560px){.links{grid-template-columns:1fr 1fr 1fr}}
-  .links a{
-    display:block;text-align:center;text-decoration:none;padding:13px 10px;border-radius:10px;
-    font-size:14.5px;font-weight:600;background:#4d7fff;color:#fff;
+  .kicker::before { content: ''; width: 28px; height: 2px; background: var(--accent); }
+  h1 { font-size: 42px; line-height: 1.02; letter-spacing: -.045em; font-weight: 900; }
+  .sub {
+    display: block; margin-top: 4px;
+    font-family: var(--serif); font-style: italic; font-weight: 700;
+    font-size: 26px; letter-spacing: -.02em; color: var(--accent);
   }
-  .links a.short{background:rgba(255,255,255,.1);border:1px solid rgba(234,240,255,.3);color:#eaf0ff;font-weight:500}
-  .links .off{
-    display:block;text-align:center;padding:13px 10px;border-radius:10px;font-size:13.5px;
-    background:rgba(255,255,255,.04);border:1px dashed rgba(234,240,255,.2);color:#7d8db8;
+
+  /* ---------- 版本条 ---------- */
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 0;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    margin-bottom: 30px;
   }
-  .tip{font-size:13px;color:#8fa4d4;margin-top:14px;line-height:1.8}
-  .foot{margin-top:36px;padding-top:18px;border-top:1px solid #e8edf8;font-size:13px;color:#8a94ad;line-height:1.9}
-  .badge{display:inline-block;background:#eaf1ff;color:#2a5bff;font-size:12px;padding:3px 10px;border-radius:999px;margin-right:6px;margin-bottom:6px}
+  .meta div {
+    flex: 1 1 auto; min-width: 96px; padding: 13px 14px 13px 0;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .meta span { font-family: var(--mono); font-size: 9px; letter-spacing: 2.4px; color: var(--dim); }
+  .meta b { font-size: 15px; font-weight: 700; letter-spacing: -.01em; }
+
+  /* ---------- 下载区 ---------- */
+  .dl { margin-bottom: 38px; }
+  .btn-main {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    width: 100%; padding: 20px 22px;
+    background: var(--accent); color: var(--accent-fg);
+    border: 0; border-radius: 12px; cursor: pointer;
+    text-decoration: none; font-weight: 800; font-size: 17px; letter-spacing: -.01em;
+    transition: transform .12s, filter .18s;
+    box-shadow: 0 10px 30px rgba(255,122,61,.22);
+  }
+  .btn-main:hover { filter: brightness(1.06); }
+  .btn-main:active { transform: scale(.985); }
+  .btn-main em {
+    font-style: normal; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 2px; opacity: .72; font-weight: 600;
+  }
+  .btn-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .btn-ghost {
+    flex: 1 1 180px; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px 16px; border-radius: 10px; cursor: pointer;
+    background: var(--card); color: var(--text);
+    border: 1px solid var(--line); text-decoration: none;
+    font-size: 13px; font-weight: 600; font-family: var(--sans);
+    transition: border-color .18s, background .18s;
+  }
+  .btn-ghost:hover { border-color: var(--line-strong); background: var(--card2); }
+  .btn-ghost:active { transform: scale(.99); }
+  .hint {
+    margin-top: 14px; font-family: var(--mono); font-size: 10.5px;
+    letter-spacing: 1.2px; color: var(--dim); line-height: 1.7;
+  }
+
+  /* ---------- 功能 ---------- */
+  .sec-title {
+    display: flex; align-items: baseline; gap: 10px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: 3px;
+    color: var(--dim); text-transform: uppercase; margin-bottom: 16px;
+  }
+  .sec-title::after { content: ''; flex: 1; height: 1px; background: var(--line); align-self: center; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 40px; }
+  .cell { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 15px; }
+  .cell b { display: block; font-size: 13.5px; margin-bottom: 7px; letter-spacing: -.01em; }
+  .cell p { font-size: 11.5px; line-height: 1.65; color: var(--dim); }
+  .cell i {
+    display: inline-block; font-style: normal; font-family: var(--mono);
+    font-size: 9px; letter-spacing: 1.8px; color: var(--accent); margin-bottom: 8px;
+  }
+
+  /* ---------- 更新日志 ---------- */
+  .log { border-top: 1px solid var(--line); margin-bottom: 40px; }
+  .log-item { padding: 15px 0; border-bottom: 1px solid var(--line); display: flex; gap: 14px; }
+  .log-v { flex: 0 0 74px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 1px; color: var(--accent); padding-top: 2px; }
+  .log-b { flex: 1; font-size: 12px; line-height: 1.75; color: var(--dim); }
+  .log-b b { color: var(--text); font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--line); padding-top: 18px;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 9.5px; letter-spacing: 1.6px; color: var(--dim);
+  }
+
+  @media (max-width: 520px) {
+    .hero { height: 268px; }
+    h1 { font-size: 34px; }
+    .sub { font-size: 21px; }
+    .grid { grid-template-columns: 1fr; }
+    .meta { display: grid; grid-template-columns: 1fr 1fr; }
+    .meta div { min-width: 0; padding: 12px 10px 12px 0; }
+    .meta div:nth-child(odd) { border-right: 1px solid var(--line); }
+    .btn-main { padding: 18px 18px; font-size: 16px; }
+    .btn-main em { display: none; }
+  }
 </style>
 </head>
 <body>
-<div class="page">
+<div class="wrap">
 
-  <div class="kicker">自用工具 · 免费 · 离线</div>
-  <h1>减脂这件事，最难的不是坚持，是「记录」</h1>
-
-  <p class="lead">
-    先问个扎心的问题：你上一次减脂，数据记在哪？体重在体重秤 App，训练在健身 App，
-    吃了什么在备忘录，进度照在相册，打卡在微信群。三天后放弃记录，两周后放弃减脂。
-    不是你不自律，是记录这件事太碎了。
-  </p>
-
-  <p>
-    我做了一个小工具，叫「<strong>刷脂实验室</strong>」。它只解决一件事：
-    <strong>让你愿意一直记下去。</strong>
-  </p>
-
-  <h2>它长什么样</h2>
-  <p>
-    打开就是一块可以自由拖拽的看板：「减脂目标 / 12 周」「每日清单」「备注」「阶段体重」……
-    想放几张卡片放几张，卡片之间还能拉线连起来——目标连着清单，清单连着数据，一条线就把逻辑讲清楚了。
-  </p>
-  <div class="quote">
-    不是填表式的死板界面，是<strong>你自己搭出来的一屏</strong>。看得见，才坚持得下去。
-  </div>
-
-  <h2>三个真正用得上的功能</h2>
-  <div class="cards">
-    <div class="feature">
-      <b>1｜训练记录，一天一格，不打字</b>
-      <span>卧推 4×12、深蹲 4×10、哑铃划船 4×12——点一下就记完，顶部进度条实时显示今天完成了多少组。练完看一眼「4 / 8 组完成，50%」，比任何鸡汤都提神。</span>
-    </div>
-    <div class="feature">
-      <b>2｜进展照片，直接拖进去</b>
-      <span>不用来回切相册。把照片从桌面拖进看板卡片即可，前后对比一目了然；安卓版直接从系统相册多选导入。</span>
-    </div>
-    <div class="feature">
-      <b>3｜六套配色，晚上看不瞎眼</b>
-      <span>克莱因忧郁、午夜深蓝、白噪反相、静电黑、脉冲电蓝、灰蓝雾。默认深色，睡前记录不刺眼；白天切浅色，截图发朋友圈也好看。</span>
+  <div class="hero">
+    <canvas id="sea"></canvas>
+    <div class="hero-txt">
+      <div class="kicker">V5.1.0 · 2026.11</div>
+      <h1>刷脂实验室
+        <span class="sub">你负责练，它负责记住。</span>
+      </h1>
     </div>
   </div>
 
-  <h2>三个平台，界面一模一样</h2>
-  <table>
-    <tr><th>平台</th><th>文件</th><th>大小</th><th>说明</th></tr>
-    <tr><td>安卓</td><td>APK</td><td>142 KB</td><td>装上是桌面 App，和原生一样</td></tr>
-    <tr><td>Windows</td><td>安装包</td><td>791 KB</td><td>有安装向导，可自选安装位置</td></tr>
-    <tr><td>网页</td><td>HTML</td><td>75 KB</td><td>双击就能打开，不用装</td></tr>
-  </table>
-  <p>关键是：<strong>它们不是三个软件，是同一个界面。</strong>电脑上记，手机上看，操作习惯完全一致。</p>
-
-  <h2>三件我坚持不做的事</h2>
-  <ol>
-    <li><strong>不联网。</strong>所有版本本地运行，程序里对外的请求全部拦死（安卓版非本地请求直接返回 403）。</li>
-    <li><strong>不要账号。</strong>不用注册、不用登录、不用手机号。</li>
-    <li><strong>不收钱、不加广告。</strong>就一个单机小工具。</li>
-  </ol>
-  <p>你的体重、体脂、训练记录、进展照片，全都在你自己的设备里。备份就是复制一个文件夹。</p>
-
-  <h2>说句实在的</h2>
-  <p>
-    它不是万能药，不会替你少吃一口饭，也不会自动长肌肉。它只是把「记录」这件事的成本，
-    从 5 分钟降到 5 秒——剩下的还是得靠你自己。
-  </p>
-  <p>如果你正在减脂，或者身边有人正在减脂，拿去吧。</p>
-
-  <div class="dark">
-    <h2>下载</h2>
-    <p style="color:#b9c6e6;font-size:15px">三个网盘任选一个，随便哪个都能下。</p>
-
-    <div class="dl-group">
-      <h3>安卓版 APK · 142 KB · Android 6.0+</h3>
-      <div class="links">
-        <a class="short" href="https://pan.baidu.com/s/11z8BtR6bxUjkFgYq1tYONw?pwd=eef9" target="_blank" rel="noopener">百度网盘 · 提取码 eef9</a>
-        <a class="short" href="https://pan.quark.cn/s/86cff6bd5b6b" target="_blank" rel="noopener">夸克网盘</a>
-        <span class="off">阿里云盘 · 待补</span>
-      </div>
-    </div>
-
-    <div class="dl-group">
-      <h3>Windows 安装包 · 791 KB · Win10 / 11</h3>
-      <div class="links">
-        <a href="https://www.alipan.com/s/Lwkq1PSXkkW" target="_blank" rel="noopener">阿里云盘</a>
-        <a class="short" href="https://pan.baidu.com/s/12f-7-ZcYWjhliQBovdHG2g?pwd=dgxn" target="_blank" rel="noopener">百度网盘 · 提取码 dgxn</a>
-        <a class="short" href="https://pan.quark.cn/s/5cf427f1fbc2" target="_blank" rel="noopener">夸克网盘</a>
-      </div>
-    </div>
-
-    <p class="tip">
-      安卓安装提示：下载后点开 APK，首次会提示「未知来源」，按提示允许一次即可。<br>
-      电脑安装提示：双击安装包，一路下一步，默认装到 D 盘，不占 C 盘空间。<br>
-      百度网盘的提取码已写在按钮上（eef9 / dgxn），链接里也带了，点开一般会自动填好。
-    </p>
+  <div class="meta">
+    <div><span>VERSION</span><b>5.1.0</b></div>
+    <div><span>SIZE</span><b>1.96 MB</b></div>
+    <div><span>SINCE</span><b>2026.11.01</b></div>
+    <div><span>PLATFORM</span><b>Android</b></div>
   </div>
 
-  <p style="margin-top:26px">
-    <span class="badge">离线运行</span><span class="badge">无广告</span>
-    <span class="badge">不要账号</span><span class="badge">数据在本地</span>
-    <span class="badge">三端同步手感</span>
-  </p>
+  <section class="dl">
+    <a class="btn-main" href="https://pan.quark.cn/s/66c880180099" target="_blank" rel="noopener noreferrer">
+      前往夸克网盘下载
+      <em>QUARK DRIVE ↗</em>
+    </a>
+    <div class="btn-row">
+      <button class="btn-ghost" id="copyBtn">⧉ 复制下载链接</button>
+      <a class="btn-ghost" href="#log">↓ 查看更新日志</a>
+    </div>
+    <div class="hint">
+      下载后在手机上安装即可，覆盖安装不会丢失数据。<br>
+      若提示「未知来源」，在系统设置里允许安装即可。
+    </div>
+  </section>
 
-  <div class="foot">
-    刷脂实验室 v1.0.0 · 个人免费使用 · 数据保存在你自己的设备里<br>
-    下载链接失效时请留言，我会重新分享。
+  <div class="sec-title">FEATURES · 有什么</div>
+  <div class="grid">
+    <div class="cell"><i>01</i><b>训练计划</b><p>按星期几固定动作，打开就能练，不用每天重新安排。</p></div>
+    <div class="cell"><i>02</i><b>自主训练</b><p>每天从动作库里挑，挑中的会变成扇形卡片，随练随选。</p></div>
+    <div class="cell"><i>03</i><b>共用动作库</b><p>一个库管所有动作，重量组数封面改一次，两种模式同步。</p></div>
+    <div class="cell"><i>04</i><b>快速添加</b><p>自动列出你做得最多的动作，一点就加。</p></div>
+    <div class="cell"><i>05</i><b>历程</b><p>每次训练留一条记录，五种情绪配色，配图配文字。</p></div>
+    <div class="cell"><i>06</i><b>落日海洋</b><p>首页是一片会动的海，练完海豹浮上来告诉你完成。</p></div>
   </div>
 
+  <div class="sec-title" id="log">CHANGELOG · 更新日志</div>
+  <div class="log">
+    <div class="log-item">
+      <div class="log-v">v5.1.0</div>
+      <div class="log-b"><b>修复与动作库编辑</b> —— 修正自主训练下卡片无法滑动；动作库每行可直接编辑名称、组数、次数、重量与封面，改动会同步到训练计划。</div>
+    </div>
+    <div class="log-item">
+      <div class="log-v">v5.0.0</div>
+      <div class="log-b"><b>训练模式 + 动作库</b> —— 新增「训练计划 / 自主训练」切换；动作库支持搜索、常用/A-Z 排序、每日选动作；快速添加取最常做的动作。</div>
+    </div>
+    <div class="log-item">
+      <div class="log-v">v4.1.0</div>
+      <div class="log-b"><b>无顶栏布局</b> —— 删除顶部栏，语言与配色按钮移到底部；海面放大到整屏，训练与历程共用同一片海。</div>
+    </div>
+    <div class="log-item">
+      <div class="log-v">v3.9.0</div>
+      <div class="log-b"><b>水下生态</b> —— 海面下有三条鱼虾按景深游动，太阳光斜射入海；练完时海豹浮上来报信。</div>
+    </div>
+  </div>
+
+  <footer>
+    <span>刷脂实验室 · 本地存储 · 不联网</span>
+    <span>MADE FOR MYSELF</span>
+  </footer>
 </div>
+
+<script>
+(function () {
+  const cv = document.getElementById('sea');
+  const g = cv.getContext('2d');
+  let W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
+
+  function resize() {
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const ACC = '255,122,61';
+
+  function frame(t) {
+    const time = t / 1000;
+    g.clearRect(0, 0, W, H);
+    const horizon = H * 0.56;
+    const sunX = W * (W < 520 ? 0.80 : 0.72), sunY = horizon - 30, sunR = W < 520 ? 22 : 26;
+
+    const glow = g.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR * 5);
+    glow.addColorStop(0, 'rgba(' + ACC + ',.42)');
+    glow.addColorStop(.4, 'rgba(' + ACC + ',.12)');
+    glow.addColorStop(1, 'rgba(' + ACC + ',0)');
+    g.fillStyle = glow;
+    g.fillRect(sunX - sunR * 6, sunY - sunR * 6, sunR * 12, sunR * 12);
+
+    g.beginPath();
+    g.arc(sunX, sunY + Math.sin(time * .9) * 1.4, sunR, 0, 6.2832);
+    g.fillStyle = 'rgba(' + ACC + ',.95)';
+    g.fill();
+
+    for (let i = 0; i < 9; i++) {
+      const y = horizon + 5 + i * 4;
+      const wob = Math.sin(time * 1.6 + i * .9) * (2 + i * .5);
+      const w = sunR * 1.5 * (1 - i / 11) * (.6 + .4 * Math.abs(Math.sin(time + i)));
+      g.beginPath();
+      g.moveTo(sunX - w + wob, y);
+      g.lineTo(sunX + w + wob, y);
+      g.strokeStyle = 'rgba(' + ACC + ',' + (.42 - i * .035).toFixed(3) + ')';
+      g.lineWidth = 2;
+      g.stroke();
+    }
+
+    for (let L = 0; L < 6; L++) {
+      const amp = 2 + L * 1.2;
+      const speed = .5 + L * .2;
+      const yBase = horizon + 8 + L * (H - horizon) / 6 * .8;
+      g.beginPath();
+      for (let x = 0; x <= W; x += 4) {
+        const k = x / W;
+        const y = yBase
+          + Math.sin(k * 6.4 + time * speed * 2 + L) * amp
+          + Math.sin(k * 13 - time * speed * 3 + L * 2) * amp * .45;
+        x === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
+      }
+      g.strokeStyle = 'rgba(236,238,240,' + (.10 + L * .09).toFixed(3) + ')';
+      g.lineWidth = L > 3 ? 1.5 : 1;
+      g.stroke();
+    }
+
+    g.beginPath();
+    g.moveTo(0, horizon); g.lineTo(W, horizon);
+    g.strokeStyle = 'rgba(236,238,240,.16)';
+    g.lineWidth = 1;
+    g.stroke();
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+
+document.getElementById('copyBtn').addEventListener('click', function () {
+  const btn = this;
+  const url = 'https://pan.quark.cn/s/66c880180099';
+  const done = () => {
+    btn.textContent = '✓ 已复制';
+    setTimeout(() => { btn.textContent = '⧉ 复制下载链接'; }, 1600);
+  };
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    ta.remove();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(fallback);
+  } else { fallback(); }
+});
+</script>
 </body>
 </html>
