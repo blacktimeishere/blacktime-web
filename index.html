@@ -58,8 +58,6 @@
   --dot-pitch:8px;
 
   /* 分段计量条 */
-  --cell:6px;
-  --cell-gap:3px;
 
   --font-sans:"PingFang SC","HarmonyOS Sans SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --font-mono:"SFMono-Regular","Cascadia Mono","Consolas","Liberation Mono",monospace;
@@ -484,25 +482,7 @@ main{flex:1 0 auto}
 }
 .grid > .card:first-child .card-desc{-webkit-line-clamp:3;min-height:0;font-size:13px}
 
-/* 主角卡变成横排：左边文字，右边读数栏 */
-@media (min-width:640px){
-  .grid > .card:first-child{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) clamp(150px,19vw,208px);
-    grid-template-rows:auto auto auto 1fr auto;
-    column-gap:clamp(26px,3vw,42px);row-gap:12px;align-items:start;
-  }
-  .grid > .card:first-child > .card-top{grid-area:1/1/2/3}
-  .grid > .card:first-child > .card-title{grid-area:2/1/3/2}
-  .grid > .card:first-child > .card-desc{grid-area:3/1/4/2}
-  .grid > .card:first-child > .tags{grid-area:4/1/5/2;align-self:start}
-  .grid > .card:first-child > .card-foot{grid-area:5/1/6/3;margin-top:0;padding-top:13px}
-  .grid > .card:first-child > .progress{
-    grid-area:2/2/4/3;align-self:start;margin-top:0;
-    padding-left:clamp(16px,2.2vw,24px);border-left:1px solid var(--line);gap:10px;
-  }
-  .grid > .card:first-child .progress-meta{flex-direction:column;align-items:flex-start;gap:5px}
-}
+/* 主角卡不另做分栏：鱼塘要占满整幅宽度才游得开 */
 
 .card-top{display:flex;align-items:center;gap:10px}
 .card-top::after{
@@ -547,40 +527,24 @@ main{flex:1 0 auto}
   color:var(--ink-2);font-size:10.5px;line-height:1.7;letter-spacing:.02em;
 }
 
-.progress{display:flex;flex-direction:column;gap:7px;margin-top:2px}
-.progress-meta{
-  display:flex;align-items:baseline;justify-content:space-between;gap:8px;
-  font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;
-  color:var(--ink-3);text-transform:uppercase;
+/* ── 鱼塘：原来放「篇幅」的地方，现在是一小池水 ──
+   只留一条水面虚线，底下什么都不画 —— 水清到看不见底，
+   鱼就悬在那儿。鱼种按分类换，一小群，各游各的。 */
+.pond{
+  position:relative;height:92px;margin-top:2px;
+  border-top:1px dotted var(--line-2);
+  overflow:hidden;
 }
-.progress-meta .pct{color:var(--ink);font-size:11.5px;letter-spacing:0;font-variant-numeric:tabular-nums}
-
-/* 像素读数：主角卡的时长用 5×7 点阵画出来，和读数栏同一套模块 */
-.pct--px{line-height:0;display:inline-flex;align-items:flex-end;gap:0}
-.pct--px small{font-size:10px;line-height:1.4;align-self:flex-end;padding-bottom:1px;margin-left:2px;color:var(--ink-3)}
-.pxn{
-  display:inline-grid;grid-template-columns:repeat(5,var(--pd,5px));
-  grid-auto-rows:var(--pd,5px);gap:1px;
-  margin-right:calc(var(--pd,5px) + 3px);
+.pond-cv{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+/* 铭牌压在水面线上，把那条虚线打断一截 */
+.pond-tag{
+  position:absolute;right:0;top:0;transform:translateY(-58%);
+  padding-left:10px;background:var(--card);z-index:1;
+  font-family:var(--font-mono);font-size:8.5px;letter-spacing:.14em;line-height:1.7;
+  color:var(--ink-4);text-transform:uppercase;white-space:nowrap;pointer-events:none;
+  transition:color .3s var(--ease),background .3s var(--ease);
 }
-.pxn i{display:block}
-.pxn i.on{background:var(--ink)}
-.grid > .card:first-child .progress-meta .pct--px{--pd:6px}
-.pm-auto{
-  font-style:normal;margin-left:6px;padding:1px 3px 0;
-  font-family:var(--font-cond);font-size:7.5px;letter-spacing:.12em;
-  background:var(--accent-wash);color:var(--accent);vertical-align:1.5px;
-}
-/* 分段像素计量条 */
-.track{
-  height:var(--cell);
-  background-image:repeating-linear-gradient(90deg,var(--line-2) 0 var(--cell),transparent var(--cell) calc(var(--cell) + var(--cell-gap)));
-}
-.track i{
-  display:block;height:100%;
-  background-image:repeating-linear-gradient(90deg,var(--c-ink) 0 var(--cell),transparent var(--cell) calc(var(--cell) + var(--cell-gap)));
-  transition:width .9s steps(14,end);
-}
+.card:hover .pond-tag,.card:focus-visible .pond-tag{background:var(--card-hover);color:var(--ink-3)}
 .card-foot{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   margin-top:auto;padding-top:13px;border-top:1px dotted var(--line-2);
@@ -1494,30 +1458,6 @@ function relDays(iso) {
   return `${Math.floor(diff / 365)} 年前`;
 }
 
-/* 5×7 像素字，只做数字 —— 读数栏用它，比任何字体都更像这台机器 */
-const PXF = {
-  '0': ['01110','10001','10011','10101','11001','10001','01110'],
-  '1': ['00100','01100','00100','00100','00100','00100','01110'],
-  '2': ['01110','10001','00001','00010','00100','01000','11111'],
-  '3': ['11111','00010','00100','00010','00001','10001','01110'],
-  '4': ['00010','00110','01010','10010','11111','00010','00010'],
-  '5': ['11111','10000','11110','00001','00001','10001','01110'],
-  '6': ['00110','01000','10000','11110','10001','10001','01110'],
-  '7': ['11111','00001','00010','00100','01000','01000','01000'],
-  '8': ['01110','10001','10001','01110','10001','10001','01110'],
-  '9': ['01110','10001','10001','01111','00001','00010','01100']
-};
-function pxDigits(str) {
-  return str.split('').map((ch) => {
-    const rows = PXF[ch];
-    if (!rows) return '';
-    const cells = rows.map((row) =>
-      [...row].map((bit) => `<i class="${bit === '1' ? 'on' : ''}"></i>`).join('')
-    ).join('');
-    return `<span class="pxn">${cells}</span>`;
-  }).join('');
-}
-
 /* ── 状态 ── */
 let cat = 'all';
 let query = '';
@@ -1544,14 +1484,20 @@ function visiblePosts() {
   });
 }
 
-/* ── 渲染：卡片刻度条要用「最长的一篇」做分母 ── */
-const maxChars = Math.max(1, ...POSTS.map(countChars));
+/* ── 渲染：篇幅不再画条，改成一眼鱼塘 ── */
+/* 鱼种看标签：哪张卡片有什么标签，就游什么鱼。
+   一篇文章挂多个标签时，取第一个认得出来的；都对不上才退回分类。 */
+function pondSpecies(p) {
+  const hit = (p.tags || []).map((t) => POND_FISH[t]).filter(Boolean)[0];
+  return hit || POND_FISH[p.cat] || 'shark';
+}
 
 function cardHTML(p, i) {
   const chars = countChars(p);
-  const pct = Math.max(6, Math.round((chars / maxChars) * 100));
   const isLead = i === 0;
   const color = CAT_COLOR[p.cat] || 'var(--accent)';
+  const key = pondSpecies(p);
+  const fish = FISH[key] || FISH.shark;
   return `
   <article class="card" data-post="${p.no}" tabindex="0" role="button"
            aria-label="阅读：${p.title}" style="--i:${i};--c:${color}">
@@ -1564,14 +1510,9 @@ function cardHTML(p, i) {
     <h3 class="card-title">${p.title}</h3>
     <p class="card-desc">${p.desc}</p>
     <div class="tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join('')}</div>
-    <div class="progress">
-      <div class="progress-meta">
-        <span>篇幅<i class="pm-auto">LEN</i></span>
-        ${isLead
-          ? `<span class="pct pct--px">${pxDigits(String(pct))}<small>%</small></span>`
-          : `<span class="pct">${pct}<small>%</small></span>`}
-      </div>
-      <div class="track"><i style="width:${pct}%"></i></div>
+    <div class="pond" data-fish="${key}">
+      <canvas class="pond-cv" aria-hidden="true"></canvas>
+      <span class="pond-tag">${fish.cn} / ${fish.en}</span>
     </div>
     <div class="card-foot">
       <span class="due">
@@ -1607,6 +1548,7 @@ function renderGrid() {
   const list = visiblePosts();
   grid.innerHTML = list.length ? list.map(cardHTML).join('') : emptyHTML();
   grid.setAttribute('aria-busy', 'false');
+  initPonds();
 }
 
 /* 筛完如果列表已经滚出视口，就把它拉回来——不然换分类像按了没反应 */
@@ -1634,6 +1576,372 @@ function renderChips() {
               data-cat="${c.key}" aria-pressed="${cat === c.key}">
               ${c.label}<span class="count">${n}</span></button>`;
   }).join('');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   鱼塘 —— 卡片里的一小池水，分类换鱼。
+   鱼是俯视角的：身体从吻到尾柄由一条半宽曲线描述，尾鳍单独一段，
+   整条鱼再按相位横向摆动。绘制时把每个字符格换算到鱼的局部坐标，
+   命中就落一个字符 —— 格子是离散的，轮廓还是连续的。
+   ═══════════════════════════════════════════════════════════ */
+const POND_FISH = {
+  生活: 'whale',
+  技术: 'shark',
+  软件: 'hammerhead',
+  阅读: 'goldfish',
+  设计: 'grasscarp',
+  摄像: 'octopus'
+};
+
+/* profile：u 从吻 0 到尾柄 1，值是半宽占鱼长的比例。
+   tail(k)：尾鳍半宽，k 从尾柄 0 到尾端 1。
+   notch(k)：中缝缺口占尾鳍半宽的比例 —— 鲸和鲨从这里分开尾叶。 */
+const FISH = {
+  whale: {
+    cn: '鲸', en: 'WHALE', lenK: 0.32, speed: 12, tailFrac: 0.21, school: 2,
+    profile: [[0, .048], [.02, .078], [.06, .108], [.13, .124], [.26, .128], [.4, .126],
+              [.55, .112], [.7, .088], [.82, .058], [.92, .034], [1, .026]],
+    tail: (k) => 0.020 + 0.195 * Math.pow(k, 1.5),
+    notch: (k) => 0.24 * k * k,
+    eyes: [[0.09, -0.66], [0.09, 0.66]]
+  },
+  shark: {
+    cn: '鲨', en: 'SHARK', lenK: 0.36, speed: 20, tailFrac: 0.25, school: 3,
+    profile: [[0, .008], [.04, .03], [.1, .058], [.2, .078], [.32, .085], [.46, .078],
+              [.6, .066], [.74, .05], [.86, .034], [.95, .024], [1, .02]],
+    tail: (k) => 0.016 + 0.132 * Math.pow(k, 1.4),
+    notch: (k) => 0.50 * k,
+    eyes: [[0.07, -0.72], [0.07, 0.72]]
+  },
+  /* 横锤：u 在 0.13 之后骤窄成脖子，一眼就能认出来 */
+  hammerhead: {
+    cn: '锤头鲨', en: 'HAMMERHEAD', lenK: 0.35, speed: 17, tailFrac: 0.25, school: 2,
+    profile: [[0, .105], [.02, .142], [.06, .150], [.11, .146], [.145, .060],
+              [.22, .056], [.34, .068], [.46, .08], [.6, .072], [.74, .052],
+              [.86, .032], [.95, .022], [1, .018]],
+    tail: (k) => 0.018 + 0.138 * Math.pow(k, 1.4),
+    notch: (k) => 0.48 * k,
+    eyes: [[0.05, -0.94], [0.05, 0.94]]
+  },
+  goldfish: {
+    cn: '金鱼', en: 'GOLDFISH', lenK: 0.30, speed: 10, tailFrac: 0.30, school: 3,
+    profile: [[0, .014], [.04, .052], [.1, .10], [.18, .14], [.28, .158], [.4, .155],
+              [.52, .132], [.64, .1], [.74, .062], [.84, .038], [.93, .026], [1, .02]],
+    tail: (k) => 0.024 + 0.205 * Math.pow(k, 1.25),
+    notch: (k) => 0.11 * k,
+    eyes: [[0.1, -0.6], [0.1, 0.6]]
+  },
+  grasscarp: {
+    cn: '草鱼', en: 'GRASS CARP', lenK: 0.36, speed: 15, tailFrac: 0.22, school: 3,
+    profile: [[0, .01], [.04, .028], [.1, .045], [.22, .058], [.36, .063], [.5, .062],
+              [.64, .055], [.76, .044], [.86, .03], [.94, .02], [1, .016]],
+    tail: (k) => 0.014 + 0.105 * Math.pow(k, 1.4),
+    notch: (k) => 0.42 * k,
+    eyes: [[0.06, -0.7], [0.06, 0.7]]
+  },
+  /* 头之后不收窄，改成一束腿，另画 */
+  octopus: {
+    cn: '八爪鱼', en: 'OCTOPUS', lenK: 0.33, speed: 7, legs: 8, tailFrac: 0, school: 2,
+    profile: [[0, .018], [.05, .07], [.12, .108], [.2, .128], [.3, .132], [.4, .118],
+              [.48, .088], [.53, .045], [.56, 0], [1, 0]],
+    tail: () => 0,
+    notch: () => 0,
+    eyes: [[0.17, -0.52], [0.17, 0.52]]
+  }
+};
+
+const POND_RAMP = ['.', ',', ':', ';', 't', '%', 'S', '8'];
+
+function pondProf(pts, u) {
+  if (u <= pts[0][0]) return pts[0][1];
+  for (let i = 1; i < pts.length; i++) {
+    if (u <= pts[i][0]) {
+      const a = pts[i - 1], b = pts[i];
+      const k = (u - a[0]) / (b[0] - a[0] || 1);
+      const e = k * k * (3 - 2 * k);       /* 平滑一下，别让轮廓一节一节的 */
+      return a[1] + (b[1] - a[1]) * e;
+    }
+  }
+  return pts[pts.length - 1][1];
+}
+
+/* 固定抖动：同一格每帧拿到同一个值，鱼身才有质感而不是在抖 */
+function pondHash(x, y) {
+  let h = (x | 0) * 374761393 + (y | 0) * 668265263;
+  h = (h ^ (h >> 13)) * 1274126177;
+  h ^= h >> 16;
+  return (h >>> 0) / 4294967296;
+}
+
+const PONDS = {
+  list: [], raf: 0, last: 0, io: null,
+  mono: '', ink: 'rgb(17,22,25)', accent: '#3c7898',
+  theme: '', still: false
+};
+
+function pondPalette() {
+  const cs = getComputedStyle(document.documentElement);
+  const rgb = (cs.getPropertyValue('--ink-rgb') || '').trim() || '17,22,25';
+  PONDS.ink = 'rgb(' + rgb + ')';
+  PONDS.accent = (cs.getPropertyValue('--accent') || '').trim() || '#3c7898';
+  PONDS.mono = (cs.getPropertyValue('--font-mono') || '').trim() || 'ui-monospace, monospace';
+  PONDS.theme = document.documentElement.dataset.theme || 'paper';
+}
+
+function initPonds() {
+  PONDS.list = [];
+  if (PONDS.io) { PONDS.io.disconnect(); PONDS.io = null; }
+  const hosts = $$('.pond');
+  if (!hosts.length) { if (PONDS.raf) { cancelAnimationFrame(PONDS.raf); PONDS.raf = 0; } return; }
+
+  pondPalette();
+  PONDS.still = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  hosts.forEach((host) => { const p = makePond(host); if (p) PONDS.list.push(p); });
+  if (!PONDS.list.length) return;
+
+  if ('IntersectionObserver' in window) {
+    PONDS.io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        const p = PONDS.list.find((q) => q.host === e.target);
+        if (p) p.on = e.isIntersecting;
+      });
+    }, { rootMargin: '140px 0px' });
+    PONDS.list.forEach((p) => PONDS.io.observe(p.host));
+  } else {
+    PONDS.list.forEach((p) => { p.on = true; });
+  }
+
+  /* 字体加载完字符宽会变，量一次要重来 */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => PONDS.list.forEach((p) => p.remeasure()));
+  }
+
+  if (!PONDS.raf) { PONDS.last = 0; PONDS.raf = requestAnimationFrame(pondTick); }
+}
+
+function pondTick(ts) {
+  PONDS.raf = requestAnimationFrame(pondTick);
+  if (document.hidden) { PONDS.last = ts; return; }
+  if (ts - PONDS.last < 32) return;              /* 30fps 足够，鱼游得慢 */
+  const dt = PONDS.last ? Math.min(0.06, (ts - PONDS.last) / 1000) : 0.032;
+  PONDS.last = ts;
+
+  if ((document.documentElement.dataset.theme || 'paper') !== PONDS.theme) pondPalette();
+  for (const p of PONDS.list) if (p.on) p.step(dt);
+}
+
+function makePond(host) {
+  const cv = host.querySelector('canvas');
+  if (!cv) return null;
+  const ctx = cv.getContext('2d');
+  if (!ctx) return null;
+
+  const kind = FISH[host.dataset.fish] || FISH.shark;
+  const st = {
+    W: 0, H: 0, cw: 6, ch: 10, cols: 0, rows: 0,
+    dpr: 0, ready: false, painted: false, fish: []
+  };
+
+  function measure() {
+    const W = host.clientWidth, H = host.clientHeight;
+    if (!W || !H) return false;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (st.ready && W === st.W && H === st.H && dpr === st.dpr) return true;
+
+    const fresh = !st.ready;
+    const oldW = st.W;
+    st.W = W; st.H = H; st.dpr = dpr;
+    cv.width = Math.round(W * dpr);
+    cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    try { ctx.font = '400 10px ' + PONDS.mono; } catch (err) { ctx.font = '400 10px monospace'; }
+    st.cw = Math.max(4.2, ctx.measureText('MMMMMMMMMM').width / 10) || 6;
+    st.ch = 10;
+    st.cols = Math.ceil(W / st.cw);
+    st.rows = Math.ceil(H / st.ch);
+    st.ready = true;
+    st.painted = false;
+    /* 宽度变化大就重新铺一遍，不然鱼会全挤在旧位置上 */
+    school(fresh || (oldW && Math.abs(W - oldW) / oldW > 0.25));
+    return true;
+  }
+
+  /* 一小群鱼：大小、方向、速度、起伏相位都不一样，才不会像列队 */
+  function school(reset) {
+    const maxHW = kind.profile.reduce((m, p) => Math.max(m, p[1]), 0.02);
+    const maxL = Math.min(st.W * kind.lenK, (st.H * 0.80) / (2 * maxHW));
+
+    if (!reset && st.fish.length) {
+      st.fish.forEach((f) => { f.L = maxL * f.sc; });
+      return;
+    }
+
+    st.fish = [];
+    const n = kind.school || 3;
+    /* 按高度分层：每条鱼占一层，层内再随机，免得挤成一条长带 */
+    const band = (st.H * 0.66) / n;
+    for (let i = 0; i < n; i++) {
+      const sc = 0.76 + Math.random() * 0.44;
+      st.fish.push({
+        x: st.W * (0.1 + ((i + Math.random()) / n) * 0.8),
+        y: st.H * 0.17 + band * (i + 0.5) + (Math.random() - 0.5) * band * 0.4,
+        baseY: 0,
+        dir: Math.random() < 0.5 ? 1 : -1,
+        ph: Math.random() * 6.283,
+        by: Math.random() * 6.283,
+        t: Math.random() * 22,
+        turn: 0,
+        speed: kind.speed * (0.72 + Math.random() * 0.56),
+        L: maxL * sc,
+        sc
+      });
+    }
+    st.fish.forEach((f) => { f.baseY = f.y; });
+  }
+
+  /* 尾柄以后才摆：越靠尾端摆幅越大，身体基本是直的 */
+  function swayOf(f, u) {
+    const k = Math.max(0, Math.min(1, (u - 0.42) / 0.58));
+    return Math.sin(f.ph + u * 3.1) * f.L * 0.034 * k * k * k;
+  }
+
+  function drawOne(f, buf) {
+    const { cw, ch, cols, rows } = st;
+    const L = f.L, dir = f.dir;
+    const halfL = L * 0.5;
+    const tailFrac = kind.tailFrac === undefined ? 0.2 : kind.tailFrac;
+    const bodyLen = L * (1 - tailFrac);
+    const tailLen = Math.max(1, L * tailFrac);
+    const endA = halfL - bodyLen;
+
+    /* 只扫这条鱼压到的那几行几列 */
+    const r0 = Math.max(0, Math.floor((f.y - L * 0.62) / ch));
+    const r1 = Math.min(rows - 1, Math.ceil((f.y + L * 0.62) / ch));
+    const c0 = Math.max(0, Math.floor((f.x - halfL) / cw) - 1);
+    const c1 = Math.min(cols - 1, Math.ceil((f.x + halfL) / cw) + 1);
+
+    /* 八爪鱼的腿：八条曲线，越往外越散，末端给个点 */
+    if (kind.legs) {
+      for (let i = 0; i < kind.legs; i++) {
+        const base = (i / (kind.legs - 1) - 0.5) * 2;
+        for (let m = 0.05; m <= 1.001; m += 0.072) {
+          const a = 0.17 * L - m * 0.60 * L;
+          const yy = base * (0.02 + 0.27 * Math.pow(m, 1.7)) * L
+                   + Math.sin(f.ph * 0.85 + i * 0.9 + m * 2.6) * 0.08 * m * m * L;
+          const c = Math.floor((f.x + a * dir) / cw);
+          const r = Math.floor((f.y + yy) / ch);
+          if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+          buf[0].push(c, r, m > 0.8 ? '.' : '~');
+        }
+      }
+    }
+
+    for (let r = r0; r <= r1; r++) {
+      const ly = (r + 0.5) * ch - f.y;
+      for (let c = c0; c <= c1; c++) {
+        const a = ((c + 0.5) * cw - f.x) * dir;
+        if (a > halfL + cw || a < -halfL) continue;
+
+        if (a >= endA) {
+          const u = (halfL - a) / bodyLen;
+          const rawW = pondProf(kind.profile, u) * L;
+          if (rawW <= 0.6) continue;
+          /* 尾柄只有几像素宽，落到 10px 的行上会整段漏掉 —— 细处至少保一格 */
+          const w = Math.max(rawW, ch * 0.5);
+          const yy = Math.abs(ly - swayOf(f, u));
+          if (yy > w) continue;
+          const d = 1 - yy / w;                       /* 0 边缘，1 中轴 */
+          const lv = d > 0.58 ? 2 : d > 0.24 ? 1 : 0;
+          const gi = Math.min(7, Math.floor(d * 7 + pondHash(c, r) * 1.4));
+          buf[lv].push(c, r, POND_RAMP[gi]);
+        } else {
+          const tau = (endA - a) / tailLen;
+          const rawHalf = kind.tail(tau) * L;
+          if (rawHalf <= 0.4) continue;
+          const half = Math.max(rawHalf, ch * 0.5);
+          const yy = Math.abs(ly - swayOf(f, 1 + tau * 0.32));
+          if (yy > half || yy < kind.notch(tau) * rawHalf) continue;
+          const d = 1 - yy / half;
+          const gi = Math.min(5, 1 + Math.floor(d * 3 + pondHash(c + 9, r) * 2));
+          buf[d > 0.5 ? 1 : 0].push(c, r, POND_RAMP[gi]);
+        }
+      }
+    }
+  }
+
+  function paint() {
+    const { W, H, cw, ch } = st;
+    ctx.clearRect(0, 0, W, H);
+
+    const buf = [[], [], []];
+    /* 靠上的先画，靠下的压在上面 */
+    const order = st.fish.slice().sort((a, b) => a.y - b.y);
+    for (const f of order) drawOne(f, buf);
+
+    ctx.fillStyle = PONDS.ink;
+    const alpha = [0.24, 0.46, 0.70];
+    for (let lv = 0; lv < 3; lv++) {
+      const b = buf[lv];
+      if (!b.length) continue;
+      ctx.globalAlpha = alpha[lv];
+      for (let i = 0; i < b.length; i += 3) {
+        ctx.fillText(b[i + 2], (b[i] + 0.5) * cw, (b[i + 1] + 0.5) * ch);
+      }
+    }
+
+    /* 眼睛用强调色点一下，整条鱼就活了 */
+    if (kind.eyes) {
+      ctx.fillStyle = PONDS.accent;
+      ctx.globalAlpha = 0.75;
+      const tf = kind.tailFrac === undefined ? 0.2 : kind.tailFrac;
+      for (const f of order) {
+        const halfL = f.L * 0.5;
+        const bodyLen = f.L * (1 - tf);
+        for (const [eu, et] of kind.eyes) {
+          const w = pondProf(kind.profile, eu) * f.L;
+          const a = halfL - eu * bodyLen;
+          ctx.fillText('o', f.x + a * f.dir, f.y + et * w + swayOf(f, eu));
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function step(dt) {
+    if (!measure()) return;
+    if (PONDS.still && st.painted) return;
+
+    if (!PONDS.still) {
+      for (const f of st.fish) {
+        f.t += dt;
+        f.ph += dt * (f.turn > 0 ? 9 : 4.6);
+
+        const margin = f.L * 0.42;
+        if (f.turn > 0) {
+          f.turn -= dt;
+          f.x += f.dir * 4 * dt;                 /* 掉头时先蹭两步 */
+          if (f.turn <= 0) f.dir *= -1;
+        } else {
+          f.x += f.dir * f.speed * dt;
+          if ((f.dir > 0 && f.x > st.W - margin) || (f.dir < 0 && f.x < margin)) {
+            f.turn = 0.3 + Math.random() * 0.45;
+          }
+        }
+        f.y = f.baseY + Math.sin(f.t * 0.42 + f.by) * st.H * 0.05;
+      }
+    }
+
+    paint();
+    st.painted = true;
+  }
+
+  return {
+    host, on: false, step,
+    remeasure() { st.ready = false; st.painted = false; }
+  };
 }
 
 function renderIndex() {
