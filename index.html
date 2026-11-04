@@ -544,6 +544,12 @@ main{flex:1 0 auto}
   transition:transform .8s var(--ease),filter .5s var(--ease);
 }
 .card:hover .pond img,.card:focus-visible .pond img{transform:scale(1.035)}
+/* 图挂了就退成一块空水面，别留个碎图标 */
+.pond--off::after{
+  content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(135deg,var(--line) 0 1px,transparent 1px 7px);
+  opacity:.5;
+}
 .card-foot{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   margin-top:auto;padding-top:13px;border-top:1px dotted var(--line-2);
@@ -1519,7 +1525,8 @@ function cardHTML(p, i) {
     <div class="tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join('')}</div>
     <div class="pond">
       <img src="media/pond/${scene}.gif" alt="" width="640" height="360"
-           loading="lazy" decoding="async">
+           loading="lazy" decoding="async"
+           onerror="this.closest('.pond').classList.add('pond--off');this.remove()">
     </div>
     <div class="card-foot">
       <span class="due">
