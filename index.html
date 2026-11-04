@@ -1015,9 +1015,11 @@ a.soft-row:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
    全部落在网格纸的既有规则里：等宽、发丝线、单一蓝。
    ═══════════════════════════════════════════ */
 
-/* 1. 雨线层 —— 只覆盖首屏上半段，底边渐隐，不进入正文 */
+/* 1. 雨线层 —— 只覆盖首屏上半段，底边渐隐，不进入正文
+   注意是 absolute 不是 fixed：这一层连同青蛙、草、陆地都是页面的一部分，
+   滚动时整层跟着页面一起走，才不会相对内容往上飘、跳行或突然消失。 */
 .rain-field{
-  position:fixed;top:0;left:0;width:100%;height:620px;
+  position:absolute;top:0;left:0;width:100%;height:620px;
   z-index:0;pointer-events:none;display:block;
   -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 64%,transparent 100%);
   mask-image:linear-gradient(180deg,#000 0%,#000 64%,transparent 100%);
@@ -1913,7 +1915,7 @@ function startRain() {
   const hits = [];
 
   let W = 0, H = 620, cw = 12, ch = 18, cols = 1;
-  let floorY = 76, fade = 1, running = false, raf = 0, prev = 0;
+  let floorY = 76, running = false, raf = 0, prev = 0;
 
   /* 两块「陆地」：报头下沿那条无形横线，以及「已发布」上面那根实体横线
      （.stats 的上边框）。后者只横在左侧文字栏，雨滴落在它的 x 范围内才算着陆。 */
@@ -1936,21 +1938,26 @@ function startRain() {
     inkCache = {};
   };
 
-  /* 第一条横线的位置：报头下沿。滚动时它会变，所以每帧读一次不值当，交给 scroll 同步 */
+  /* 画布贴在页面顶部，会随页面滚走。所以量位置不能直接用 getBoundingClientRect，
+     得先减掉画布自己的视口偏移 —— 量到的是「文档坐标」，滚动时它是常量。 */
+  const cvTop = () => cv.getBoundingClientRect().top;
+
+  /* 第一条横线：报头下沿 */
   const lineY = () => {
     const m = document.querySelector('.masthead');
-    return m ? m.getBoundingClientRect().bottom : 76;
+    return m ? m.getBoundingClientRect().bottom - cvTop() : 76;
   };
 
-  /* 「陆地」的位置：读数栏的上边框。滚动时它同样会移动，跟着 sync 一起重测。
-     落在画布外、或被推到太靠底边时就不算陆地，免得雨在看不见的地方停住。 */
+  /* 「陆地」：读数栏的上边框。文档坐标，只在排版变化时重测，
+     滚动不重测 —— 重测才会出现滚动时草行跳一格、青蛙跟着弹的情况。 */
   const refreshLand = () => {
     const st = document.querySelector('.stats');
     if (!st) { landY = 0; killY = H * 0.82; return; }
     const r = st.getBoundingClientRect();
+    const top = r.top - cvTop();
     landX0 = r.left;
     landX1 = r.right;
-    landY = r.top > 12 && r.top < H - 26 ? r.top : 0;
+    landY = top > ch * 1.2 && top < H - ch * 2 ? top : 0;
     killY = Math.max(H * 0.82, landY > 0 ? landY + ch * 5 : 0);
   };
 
@@ -1995,7 +2002,8 @@ function startRain() {
        蛙和苍蝇都能跳进标题里，但谁也不许越过这行小字。 */
     const gy = landY - ch * 0.42;
     const eb = document.querySelector('.eyebrow');
-    const ceil = (eb ? eb.getBoundingClientRect().bottom : h1.getBoundingClientRect().top) + ch * 0.45;
+    const ebBottom = eb ? eb.getBoundingClientRect().bottom - cvTop() : h1.getBoundingClientRect().top - cvTop();
+    const ceil = ebBottom + ch * 0.45;
     riseMax = Math.floor((gy - ch * 4 - ceil) / ch);   /* 腾空四行高，脚底比草行高一行 */
     if (riseMax < 2) { fieldC1 = -1; return; }
     riseMax = Math.min(13, riseMax);
@@ -2205,8 +2213,12 @@ function startRain() {
     alignLand();
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const hero = document.querySelector('.hero');
-    W = window.innerWidth;
-    H = Math.max(240, Math.min(window.innerHeight, hero ? hero.getBoundingClientRect().bottom : window.innerHeight * 0.72));
+    /* 宽度取画布自己的排版宽度（不含滚动条）；高度量到首屏底边，
+       同样是文档坐标 —— 滚动位置不影响这块区域的大小 */
+    const cwBox = cv.getBoundingClientRect();
+    W = Math.max(320, Math.round(cwBox.width) || document.documentElement.clientWidth);
+    const heroBottom = hero ? hero.getBoundingClientRect().bottom - cwBox.top : window.innerHeight * 0.72;
+    H = Math.max(240, Math.min(1800, heroBottom + 6));
     cw = W > 1500 ? 13 : W > 760 ? 12 : 11;
     ch = Math.round(cw * 1.55);
     cols = Math.ceil(W / cw) + 1;
@@ -2346,14 +2358,12 @@ function startRain() {
     cancelAnimationFrame(raf);
   };
 
-  /* 滚出首屏就淡出并停掉，雨只在顶部这一段存在 */
+  /* 这一层跟着页面走，所以滚动时什么都不用重算：只看看它还露不露在视口里，
+     整块滚过之后就把动画停掉，省点电。 */
   const sync = () => {
-    const y = window.scrollY || window.pageYOffset || 0;
-    floorY = lineY();
-    refreshLand();
-    fade = Math.max(0, 1 - y / (H * 0.85));
-    cv.style.opacity = fade.toFixed(2);
-    if (fade < 0.04) stop(); else start();
+    const r = cv.getBoundingClientRect();
+    const onScreen = r.bottom > 8 && r.top < window.innerHeight;
+    if (onScreen) start(); else stop();
   };
 
   const boot = () => {
@@ -2365,14 +2375,8 @@ function startRain() {
 
   boot();
 
-  /* 字体落定后 hero 会变高，重新对一次线；雨区差得多了再重算一次 */
-  window.addEventListener('load', () => {
-    alignLand();
-    const hero = document.querySelector('.hero');
-    if (!hero) return;
-    const nb = Math.min(window.innerHeight, hero.getBoundingClientRect().bottom);
-    if (Math.abs(nb - H) > 24) { stop(); measure(); sync(); }
-  });
+  /* 字体与海报图落定后首屏高度会变，整块重量一遍（顺带把草行重新对到读数栏那条线） */
+  window.addEventListener('load', () => { stop(); boot(); });
 
   let rt = 0, st = 0;
   window.addEventListener('resize', () => {
