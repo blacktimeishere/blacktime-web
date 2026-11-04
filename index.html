@@ -16,7 +16,7 @@
 <meta property="og:title" content="请赐给我一个梦 · 手写记录">
 <meta property="og:description" content="写代码、拍照、读书、看电影。慢慢写，不定期更新，首页还养着一只青蛙。">
 <meta property="og:url" content="https://blacktimeishere.pages.dev/">
-<meta property="og:image" content="https://blacktimeishere.pages.dev/media/hero-portrait.jpg">
+<meta property="og:image" content="https://blacktimeishere.pages.dev/media/hero/hero-portrait.jpg">
 <meta property="og:image:width" content="640">
 <meta property="og:image:height" content="640">
 <meta property="og:image:alt" content="风吹过短发的线稿，十秒循环">
@@ -24,7 +24,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="请赐给我一个梦 · 手写记录">
 <meta name="twitter:description" content="写代码、拍照、读书、看电影。慢慢写，不定期更新，首页还养着一只青蛙。">
-<meta name="twitter:image" content="https://blacktimeishere.pages.dev/media/hero-portrait.jpg">
+<meta name="twitter:image" content="https://blacktimeishere.pages.dev/media/hero/hero-portrait.jpg">
 <style>
 /* ═══════════════════════════════════════════════════════════
    今天写点什么？ — 与「今天我们要做什么？」同一套视觉语法
@@ -1178,8 +1178,8 @@ a.soft-row:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
         <figure class="portrait">
           <div class="portrait-frame">
             <video id="portraitVideo" class="portrait-video"
-                   src="media/hero-portrait.mp4"
-                   poster="media/hero-portrait.jpg"
+                   src="media/hero/hero-portrait.mp4"
+                   poster="media/hero/hero-portrait.jpg"
                    autoplay muted loop playsinline preload="metadata"
                    aria-label="风吹过短发的线稿，十秒循环"></video>
             <span class="card-px" aria-hidden="true"></span>
@@ -1239,54 +1239,11 @@ a.soft-row:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
       <div class="sec-head">
         <span class="sec-idx">02</span>
         <span class="sec-k">摄像 / CAMERA LOG</span>
-        <i>2 张 · 2026</i>
+        <i id="camMeta">—</i>
       </div>
 
-      <div class="reels reels--photo">
-        <article class="reel reel--photo">
-          <div class="reel-shot reel-shot--wide">
-            <button class="reel-open" type="button" data-full="media/photo-sunline.jpg"
-                    data-cap="金线 / 2026" aria-label="放大查看《金线》">
-              <img class="reel-photo" src="media/photo-sunline.jpg"
-                   alt="落日在水面上拉出一条竖直的金色光柱，一只水鸟从光里游过，尾迹拖出 V 字"
-                   width="1440" height="655" loading="lazy" decoding="async">
-            </button>
-            <span class="reel-zoom" aria-hidden="true">看大图</span>
-          </div>
-          <div class="reel-body">
-            <div class="reel-top"><span class="reel-no">FRAME 01</span><span class="reel-date">2026</span></div>
-            <h3 class="reel-title">金线</h3>
-            <p class="reel-desc">太阳贴近水面之后，光被压成一条竖线。一只水鸟从光里游出来，尾迹拖成 V 字，把那条线折了一下。</p>
-            <div class="reel-spec">
-              <span><b>1440 × 655</b>像素</span>
-            </div>
-          </div>
-        </article>
-
-        <article class="reel reel--photo">
-          <div class="reel-shot">
-            <button class="reel-open" type="button" data-full="media/photo-reflection.jpg"
-                    data-cap="倒影 / 2026.10.10" aria-label="放大查看《倒影》">
-              <img class="reel-photo" src="media/photo-reflection.jpg"
-                   alt="雨点落在水面上，把对岸的楼、树和一块黄色招牌揉成一条条竖纹"
-                   width="1600" height="1067" loading="lazy" decoding="async">
-            </button>
-            <span class="reel-zoom" aria-hidden="true">看大图</span>
-          </div>
-          <div class="reel-body">
-            <div class="reel-top"><span class="reel-no">FRAME 02</span><span class="reel-date">2026.10.10</span></div>
-            <h3 class="reel-title">倒影</h3>
-            <p class="reel-desc">雨点落下来，一圈圈涟漪把对岸的楼、树和那块黄招牌揉成竖纹。每一圈都在重排同一幅画。</p>
-            <div class="reel-spec">
-              <span><b>105</b>毫米</span>
-              <span><b>f/5.6</b>光圈</span>
-              <span><b>1/500</b>快门</span>
-              <span><b>640</b>ISO</span>
-              <span><b>D7100</b>机身</span>
-            </div>
-          </div>
-        </article>
-      </div>
+      <!-- 照片卡由 data/photos.js 渲染，一张照片一个 md -->
+      <div class="reels reels--photo" id="reels"></div>
     </section>
 
     <!-- ── 软件板块 ── -->
@@ -1379,7 +1336,7 @@ a.soft-row:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 
       <div class="wx-panel" id="wxPanel">
         <figure class="wx-card">
-          <img class="wx-qr" src="media/wechat-qr.jpg" alt="微信公众号二维码" width="430" height="430" decoding="async">
+          <img class="wx-qr" src="media/qr/wechat-qr.jpg" alt="微信公众号二维码" width="430" height="430" decoding="async">
           <figcaption class="wx-cap"><b>微信扫一扫</b>关注公众号 · 长按图片也能识别</figcaption>
         </figure>
       </div>
@@ -1430,34 +1387,20 @@ a.soft-row:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
   </div>
 </aside>
 
+<!-- 内容数据：由 build.py 从 content/ 生成，别手改。
+     加文章 → content/posts/，加照片 → content/photos/，然后跑 python build.py -->
+<script src="data/posts.js"></script>
+<script src="data/photos.js"></script>
+
 <script>
 /* ═══════════════════════════════════════════════════════════
-   文章数据 —— 想换成自己的，只改这一块就够了。
-   加一篇：复制一段 { … }, 改 no / date / title / desc / cat / tags / body。
-   no 是编号，date 用 YYYY-MM-DD，body 是段落数组。
+   数据入口 —— 文章和照片都不在这个文件里了。
+   内容住在 content/（一篇一个 md，一张照片一个 md），build.py 把它编译成
+   data/posts.js 与 data/photos.js，上面两行 <script src> 先加载它们。
+   这里只留兜底：数据没加载上，页面退回空站，而不是白屏。
    ═══════════════════════════════════════════════════════════ */
-const POSTS = [
-  {
-    no: '01',
-    date: '2026-11-04',
-    cat: '生活',            // 摄像 / 软件 / 设计 / 技术 / 生活 / 阅读
-    title: '今天我搭建出了人生的第一个博客',
-    desc: '用 AI 三分钟就能做出一个网站，但那终归不是你自己的东西。',
-    tags: ['生活', '技术'],
-    body: [
-      '今天我搭建出了人生的第一个博客。',
-      '很早之前我就想要做一个自己的博客用来写一点东西，其实这玩意也没什么技术难度，最简单的用github来部署也可以，花几十人民币租一年服务器也可以，但长期的工作让我把做博客这件事情的工期拉的巨长，什么设计UI，确定自己美术风格等等，用ai做出个网页倒是容易，你要是不讲究，3分钟就可以做出一个可以用的框架去搭建一个网站，甚至在agent普及之后你甚至不需要知道怎么部署上线，你只需要跟ai说一下，它自己就能做完直接甩给你一个网址。',
-      '但那终归不是你自己的东西，只是用ai做出个迷惑自己的表象罢了，整个博客里没有任何一个能够代表你自己的东西，任何一个参观你博客的人根本无从得知你是怎样的一个人，只能看到ai默认的UI设计，像用死人嘴巴说出来的标准学院派文案，以及空洞的内容。',
-      '搭建博客就像一个对自己审问的过程，我究竟是怎样的一个人，我究竟是个什么东西，我要去哪我要干嘛，这些都可以写在你自己的博客里。也不需要上来就急着搭建各种各样的板块，如果你用不上的话，反而会显得你的博客很空洞，我的意见是就跟你买东西一样按照自己的需求来，你到底想要展示些什么东西给大众看，你就做一个版块放上去。',
-      '在搭建你的框架和板块之后，就该确定你的美术风格了，什么ASCII美术、赛璐璐、未来复古、2000年梦幻、包豪斯等等，选择一个你自己喜欢的风格，但我可不是说直接把以上词语当作关键词丢给ai就行了，最主要的是放点你自己的东西，做出你自己的风格，比如在主页上做一只肥青蛙。',
-      '在调试好你自己的风格之后，你就可以将你的HTML和js文件打包准备部署上线了（有些ai会将所有文件都写到html文件里），你可以选择免费的Cloudflare服务器（你有钱也可以找付费的阿里云）：',
-      '第一：登录你的GitHub账号，新建一个仓库。',
-      '第二：把你的所有文件都拖到这个仓库里。',
-      '第三：登录Cloudflare，找到新建”page”部分，然后在里面链接好你自己的GitHub账号，点击部署。',
-      '砰！完成！你制作了一个静态网页博客！希望你能经常更新！'
-    ]
-  }
-];
+const POSTS = window.POSTS || [];
+const PHOTOS = window.PHOTOS || [];
 
 /* ── 常量 ── */
 const CATS = [
@@ -1595,6 +1538,60 @@ function emptyHTML() {
     <p>换个分类，或者清掉搜索词再看看。</p>
     <button class="btn btn-outline empty-reset" type="button" data-reset>清空筛选 / RESET</button>
   </div>`;
+}
+
+/* ── 摄像：一张照片一个 md，这里只负责把它摆进卡片 ──
+   宽图用 reel-shot--wide（2.2:1），其余按 3:2 开框。 */
+const esc = (v) => String(v).replace(/[&<>"]/g,
+  (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function photoHTML(ph, i) {
+  const cap = ph.date ? `${ph.title} / ${ph.date}` : ph.title;
+  const shot = ph.wide ? 'reel-shot reel-shot--wide' : 'reel-shot';
+  const specs = (ph.specs || [])
+    .map((sp) => `<span><b>${esc(sp.b)}</b>${esc(sp.t)}</span>`).join('');
+  return `
+        <article class="reel reel--photo">
+          <div class="${shot}">
+            <button class="reel-open" type="button" data-full="${esc(ph.file)}"
+                    data-cap="${esc(cap)}" aria-label="放大查看《${esc(ph.title)}》">
+              <img class="reel-photo" src="${esc(ph.file)}" alt="${esc(ph.alt)}"
+                   width="${ph.w || ''}" height="${ph.h || ''}" loading="lazy" decoding="async">
+            </button>
+            <span class="reel-zoom" aria-hidden="true">看大图</span>
+          </div>
+          <div class="reel-body">
+            <div class="reel-top"><span class="reel-no">FRAME ${pad2(i + 1)}</span><span class="reel-date">${esc(ph.date)}</span></div>
+            <h3 class="reel-title">${esc(ph.title)}</h3>
+            <p class="reel-desc">${esc(ph.desc)}</p>
+            <div class="reel-spec">${specs}</div>
+          </div>
+        </article>`;
+}
+
+function renderPhotos() {
+  const box = $('#reels');
+  if (!box) return;
+  if (!PHOTOS.length) {
+    box.className = 'reels reels--empty';
+    box.innerHTML = `
+        <article class="reel reel--empty">
+          <div class="reel-shot"></div>
+          <div class="reel-body">
+            <div class="reel-top"><span class="reel-no">FRAME 00</span><span class="reel-date">—</span></div>
+            <h3 class="reel-title">还没有照片</h3>
+            <p class="reel-desc">拍到的会贴在这里。</p>
+          </div>
+        </article>`;
+  } else {
+    box.className = 'reels reels--photo';
+    box.innerHTML = PHOTOS.map(photoHTML).join('');
+  }
+  const years = [...new Set(PHOTOS.map((ph) => String(ph.date).slice(0, 4)).filter(Boolean))].sort().reverse();
+  const meta = $('#camMeta');
+  if (meta) meta.textContent = PHOTOS.length
+    ? `${PHOTOS.length} 张 · ${years.join(' / ')}`
+    : '0 张';
 }
 
 function renderGrid() {
@@ -1894,7 +1891,11 @@ const closeLb = () => {
   if (lbFrom) { lbFrom.focus({ preventScroll: true }); lbFrom = null; }
 };
 
-document.querySelectorAll('.reel-open').forEach((b) => b.addEventListener('click', () => openLb(b)));
+/* 委托到 document：照片是渲染出来的，换一批也不用重新绑 */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('.reel-open');
+  if (b) openLb(b);
+});
 if (lb) {
   lb.addEventListener('click', (e) => { if (e.target === lb) closeLb(); });
   const lbBtn = $('#lbClose');
@@ -2531,6 +2532,7 @@ function tickClock() {
   renderChips();
   renderGrid();
   renderIndex();
+  renderPhotos();
 
   /* ASCII 动效层 */
   startRain();

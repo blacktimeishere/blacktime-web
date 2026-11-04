@@ -14,3 +14,10 @@ desktop.ini
 
 # 依赖（本页没有，留着防手滑）
 node_modules/
+
+# 照片原图：几百 MB，留在本地，仓库里只放导出后的网页版
+content/originals/
+*.NEF
+*.CR2
+*.ARW
+*.DNG
