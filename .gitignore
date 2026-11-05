@@ -21,3 +21,10 @@ content/originals/
 *.CR2
 *.ARW
 *.DNG
+
+# 临时脚本与调试产物（_tools/ 里是本地部署工具，不进仓库）
+_tools/
+_*.html
+_*.png
+_*.js
+_*.json

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="青蛙">
+  <rect width="32" height="32" fill="#f8fafb"/>
+  <g fill="#111619">
+    <rect x="4" y="7" width="23" height="17" rx="7"/>
+    <rect x="7" y="23" width="18" height="4"/>
+    <rect x="2" y="25" width="7" height="4"/>
+    <rect x="22" y="25" width="7" height="4"/>
+    <circle cx="10" cy="7" r="6"/>
+    <circle cx="21" cy="7" r="6"/>
+  </g>
+  <circle cx="10" cy="7" r="4.5" fill="#f8fafb"/>
+  <circle cx="21" cy="7" r="4.5" fill="#f8fafb"/>
+  <circle cx="10" cy="6" r="2" fill="#111619"/>
+  <circle cx="21" cy="6" r="2" fill="#111619"/>
+  <rect x="12" y="17" width="8" height="2" fill="#f8fafb"/>
+</svg>
