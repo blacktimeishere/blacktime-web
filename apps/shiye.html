@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>拾页 · 可交互试用</title>
+<meta name="description" content="拾页：漫画与小说，一个书架读完。打开就能试——首页书架、五种跟手翻页的小说阅读器、漫画阅读。" />
+<meta name="theme-color" content="#ECE7DA" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="拾页 · 可交互试用" />
+<meta property="og:description" content="漫画与小说，一个书架读完。点一下就能进去试。" />
+<link rel="icon" href="data:," />
+<style>
+  :root {
+    --bg: #F4F0E6;
+    --stage-bg: #ECE7DA;
+    --paper: #FAF7EF;
+    --ink: #2E2B26;
+    --accent: #8A3B32;
+    --marker: #F1E1A6;
+    --muted: #7A7468;
+    --line: rgba(46, 43, 38, 0.16);
+    --line-soft: rgba(46, 43, 38, 0.09);
+    --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei', sans-serif;
+    --font-serif: Georgia, 'Times New Roman', 'Songti SC', STSong, SimSun, serif;
+    --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--stage-bg);
+    font-family: var(--font-sans);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+  /* ── 舞台：桌面居中手机 + 左侧说明；移动端全屏 ── */
+  .stage {
+    position: relative; z-index: 1;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    gap: 72px; padding: 28px;
+  }
+
+  /* ── 背景：ASCII 草履虫在纸面上浮游 ── */
+  #ocean {
+    position: fixed; inset: 0; width: 100%; height: 100%;
+    z-index: 0; pointer-events: none;
+  }
+  /* 文字与手机所在的区域盖一层淡淡的纸色，虫浮到下面自然隐去 */
+  .ocean-veil {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(30% 52% at 25% 47%, rgba(236,231,218,.99) 0%, rgba(236,231,218,.94) 52%, rgba(236,231,218,0) 82%);
+  }
+  .side-info { max-width: 306px; display: none; }
+  @media (min-width: 960px) { .side-info { display: flex; flex-direction: column; } }
+  @media (min-width: 960px) and (max-width: 1199px) { .stage { gap: 40px; padding: 24px 20px; } }
+  .side-info h1 { font-size: 42px; font-weight: 700; letter-spacing: 0.02em; margin: 0; line-height: 1.1; }
+  .side-info .sub { font-size: 15px; font-weight: 500; margin: 9px 0 24px; color: var(--muted); }
+
+  /* ── 试一试 ── */
+  .try { margin: 0 0 22px; }
+  .try-top {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .2em;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 10px;
+  }
+  .try-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .try-grid button {
+    text-align: center; background: rgba(250,247,239,.72); border: 1px solid var(--line);
+    border-radius: 9px; padding: 10px 8px; color: var(--ink);
+    font-size: 13px; font-weight: 600; line-height: 1.2;
+    transition: background .14s ease, border-color .14s ease, transform .1s ease;
+  }
+  .try-grid button:hover { background: #fff; border-color: rgba(138,59,50,.34); }
+  .try-grid button:active { transform: scale(.975); }
+  .try-grid button.on {
+    background: rgba(138,59,50,.07); border-color: rgba(138,59,50,.45); color: var(--accent);
+  }
+
+  /* ── 实时文案 ── */
+  .now {
+    border-top: 1px solid var(--line);
+    padding-top: 15px;
+    margin: 0 0 20px;
+    min-height: 150px;
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .now.out { opacity: 0; transform: translateY(5px); }
+  .now-top {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em;
+    color: var(--ink); text-transform: uppercase; margin-bottom: 10px;
+  }
+  .now-top .pulse {
+    width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
+    margin-left: auto; opacity: .35;
+  }
+  .now-top .pulse.beat { animation: beat 1.1s ease-out; }
+  @keyframes beat { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(2.8); opacity: 0; } }
+  .now h2 { font-size: 19px; font-weight: 700; line-height: 1.45; letter-spacing: .01em; margin: 0 0 8px; }
+  .now p { font-size: 13px; line-height: 1.9; color: var(--muted); margin: 0 0 12px; min-height: 4.9em; }
+  .now-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+  .now-meta span {
+    font-size: 11px; line-height: 1; color: var(--muted);
+    border: 1px solid var(--line); border-radius: 999px; padding: 5px 9px;
+  }
+  .now-meta span.hot { color: var(--accent); border-color: rgba(138,59,50,.28); background: rgba(138,59,50,.05); }
+
+  .acts { display: flex; align-items: center; margin-bottom: 13px; }
+  .acts .solid {
+    display: flex; align-items: center; justify-content: center; width: 100%;
+    font-size: 12.5px; font-weight: 600; border-radius: 8px; padding: 11px 14px;
+    background: var(--ink); color: var(--paper);
+    border: 1px solid var(--ink); transition: transform .12s ease, opacity .12s ease;
+  }
+  .acts a:active { transform: scale(.97); }
+  .acts a:hover { opacity: .85; }
+  .alt { margin: 0 0 2px; font-size: 11px; line-height: 1.7; color: var(--muted); }
+  .alt a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: rgba(46,43,38,.28); }
+  .alt a:hover { color: var(--ink); }
+
+  .device {
+    position: relative;
+    width: min(390px, calc(100vw - 32px));
+    height: min(844px, calc(100dvh - 56px));   /* 56 = 舞台上下各 28 的内边距，留满才不会顶出滚动条 */
+    background: var(--paper);
+    border-radius: 44px;
+    overflow: hidden;
+    box-shadow: 0 0 0 1px rgba(46,43,38,0.10), 0 28px 60px -26px rgba(46,43,38,0.35);
+    flex: none;
+  }
+  .device.landed { animation: landed .5s ease; }
+  @keyframes landed { 0% { box-shadow: 0 0 0 1px rgba(46,43,38,.10), 0 0 0 0 rgba(138,59,50,.28), 0 28px 60px -26px rgba(46,43,38,.35); }
+    40% { box-shadow: 0 0 0 1px rgba(46,43,38,.10), 0 0 0 10px rgba(138,59,50,.10), 0 28px 60px -26px rgba(46,43,38,.35); }
+    100% { box-shadow: 0 0 0 1px rgba(46,43,38,.10), 0 0 0 0 rgba(138,59,50,0), 0 28px 60px -26px rgba(46,43,38,.35); } }
+  .device iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: var(--paper); }
+  .boot {
+    position: absolute; inset: 0; z-index: 3; background: var(--paper);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    font-size: 12px; letter-spacing: .04em; color: var(--muted);
+    transition: opacity .4s ease, visibility .4s;
+  }
+  .boot.hide { opacity: 0; visibility: hidden; }
+  .boot .ring {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid rgba(46,43,38,.14); border-top-color: var(--accent);
+    animation: spin .9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── 移动端：铺满 + 两个浮动按钮 + 上滑面板 ── */
+  .chip, .fabs, .sheet, .sheet-back { display: none; }
+  @media (max-width: 959px) {
+    .stage { padding: 0; }
+    .device { width: 100vw; height: 100dvh; border-radius: 0; box-shadow: none; }
+
+    .fabs {
+      display: flex; align-items: center; gap: 7px;
+      position: fixed; right: 12px; bottom: calc(env(safe-area-inset-bottom, 0px) + 94px); z-index: 30;
+    }
+    .fab {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(250,247,239,.94); border: 1px solid var(--line); border-radius: 999px;
+      padding: 8px 12px; font-size: 11.5px; font-weight: 600; color: var(--ink);
+      backdrop-filter: blur(8px); box-shadow: 0 10px 22px -16px rgba(46,43,38,.8);
+    }
+    .fab-main { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .fab .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .8; flex: none; }
+
+    .sheet {
+      display: block;
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+      background: var(--paper); border-radius: 16px 16px 0 0; border-top: 1px solid var(--line);
+      padding: 16px 18px calc(env(safe-area-inset-bottom, 0px) + 18px);
+      transform: translateY(101%); transition: transform .26s ease;
+      box-shadow: 0 -18px 40px -30px rgba(46,43,38,.6);
+      max-height: 82dvh; overflow: auto;
+    }
+    .sheet.open { transform: none; }
+    .sheet .sh-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .sheet .sh-top .t { font-size: 11px; font-family: var(--font-mono); letter-spacing: .18em; color: var(--muted); }
+    .sheet .sh-top button {
+      border: 1px solid var(--line); background: none; width: 28px; height: 28px;
+      border-radius: 8px; font-size: 14px; line-height: 1; color: var(--ink);
+    }
+    .sheet h2 { font-size: 17px; font-weight: 700; margin: 0 0 8px; line-height: 1.5; }
+    .sheet p { font-size: 13px; line-height: 1.9; color: var(--muted); margin: 0; }
+    .sh-acts { display: flex; gap: 9px; margin-top: 16px; }
+    .sh-acts a {
+      flex: 1; text-align: center;
+      font-size: 12.5px; font-weight: 600; border-radius: 8px; padding: 10px 15px;
+      border: 1px solid var(--ink); color: var(--ink);
+    }
+    .sh-acts a.solid { background: var(--ink); color: var(--paper); }
+    .sheet .alt { margin: 10px 0 0; }
+    .sheet-back {
+      display: block; position: fixed; inset: 0; z-index: 35; background: rgba(46,43,38,.3);
+      opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s;
+    }
+    .sheet-back.open { opacity: 1; visibility: visible; }
+
+    /* 移动端的试用清单 */
+    #trySheet .t-list { display: grid; gap: 6px; margin-top: 2px; }
+    #trySheet .t-list button {
+      text-align: left; background: rgba(244,240,230,.7); border: 1px solid var(--line-soft); border-radius: 10px;
+      padding: 12px 13px; font-size: 13.5px; font-weight: 600; color: var(--ink);
+    }
+    #trySheet .t-list button:active { background: rgba(138,59,50,.07); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="ocean" aria-hidden="true"></canvas>
+<div class="ocean-veil" aria-hidden="true"></div>
+
+<div class="stage">
+  <aside class="side-info">
+    <h1>拾页</h1>
+    <p class="sub">漫画与小说，一个书架读完</p>
+
+    <div class="try">
+      <div class="try-top">试一试</div>
+      <div class="try-grid" id="tryGrid">
+        <button type="button" data-try="novel">小说阅读</button>
+        <button type="button" data-try="comic">漫画阅读</button>
+        <button type="button" data-try="home">首页书架</button>
+        <button type="button" data-try="shelf">小说库</button>
+      </div>
+    </div>
+
+    <div class="now" id="now" aria-live="polite">
+      <div class="now-top">
+        <span id="nowTag">首页</span>
+        <span class="pulse" id="nowPulse"></span>
+      </div>
+      <h2 id="nowTitle">十本书，滑着挑</h2>
+      <p id="nowDesc">最近看过的十本，漫画和小说混排。左右滑动换书。</p>
+      <div class="now-meta" id="nowMeta"><span class="hot">最近 10 本</span><span>横滑切换</span></div>
+    </div>
+
+    <div class="acts">
+      <a class="solid" href="https://pan.quark.cn/s/dfbbda067ed0" target="_blank" rel="noopener">下载 APK</a>
+    </div>
+    <p class="alt">v1.2.2 · 31 MB · Android</p>
+  </aside>
+
+  <div class="device" id="device">
+    <div class="boot" id="boot"><span class="ring" aria-hidden="true"></span><span>正在载入原型…</span></div>
+    <iframe id="demo" src="./shiye-demo/" title="拾页 · 可交互试用" allow="clipboard-write"></iframe>
+  </div>
+</div>
+
+<div class="fabs">
+  <button class="fab fab-main" id="fabTry" type="button"><span class="dot"></span>试一试</button>
+  <button class="fab" id="fabInfo" type="button">说明</button>
+</div>
+
+<div class="sheet-back" id="sheetBack"></div>
+
+<div class="sheet" id="sheet" role="dialog" aria-label="当前功能说明">
+  <div class="sh-top">
+    <span class="t" id="shTag">首页</span>
+    <button id="shClose" type="button" aria-label="关闭">×</button>
+  </div>
+  <h2 id="shTitle">十本书，滑着挑</h2>
+  <p id="shDesc">最近看过的十本，漫画和小说混排。左右滑动换书。</p>
+  <div class="sh-acts">
+    <a class="solid" href="https://pan.quark.cn/s/dfbbda067ed0" target="_blank" rel="noopener">下载 APK</a>
+  </div>
+  <p class="alt">v1.2.2 · 31 MB · Android</p>
+</div>
+
+<div class="sheet" id="trySheet" role="dialog" aria-label="试一试">
+  <div class="sh-top">
+    <span class="t">试一试</span>
+    <button id="tryClose" type="button" aria-label="关闭">×</button>
+  </div>
+  <div class="t-list" id="tryList">
+    <button type="button" data-try="novel">小说阅读</button>
+    <button type="button" data-try="comic">漫画阅读</button>
+    <button type="button" data-try="home">首页书架</button>
+    <button type="button" data-try="shelf">小说库</button>
+  </div>
+</div>
+
+<script>
+/* ── 背景：ASCII 草履虫 ──
+   一只单细胞生物在纸上漂：鞋底形的虫体、周身不断划动的纤毛、
+   中间一坨压深的大核。轮廓用归一化坐标算出来再落成字符，
+   纤毛的明暗沿体长向后传，所以看起来一直在轻轻颤。 */
+(function () {
+  var cvs = document.getElementById('ocean');
+  if (!cvs || !cvs.getContext) return;
+  var ctx = cvs.getContext('2d');
+  var INK = '46,43,38';
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var CELL_W = 11, CELL_H = 12;
+  var PHASES = 12;                 /* 纤毛波动一个周期预渲染成 12 张字符帧 */
+
+  /* ── 草履虫（paramecium）──
+     单细胞，鞋底形：前端钝圆、后端收成圆尾，一侧有一道斜的口沟。
+     周身密布纤毛，纤毛按后向波依次摆动；体内一坨大核、两端各一个伸缩泡。
+     几何写在归一化坐标里：x ∈ [0,200] 沿体长，y ∈ [0,100] 横向，中线 y=50。 */
+  var HEAD_X = 6, BODY_LEN = 188, MID_Y = 50;
+
+  /* 半宽：0 = 前端，1 = 后端。前端迅速胀圆，后段慢慢收成圆尾 */
+  function halfWidth(s) {
+    if (s < 0.28) return 12 + 19 * Math.pow(Math.sin((s / 0.28) * Math.PI / 2), 0.6);
+    return 10 + 20 * Math.pow(1 - (s - 0.28) / 0.72, 1.25);
+  }
+
+  /* 口沟：上侧轮廓挖一道浅槽，让"鞋口"看得出来 */
+  function groove(s) {
+    if (s < 0.26 || s > 0.74) return 0;
+    return 12 * Math.sin(Math.PI * (s - 0.26) / 0.48);
+  }
+
+  /* 口沟真正的样子：一条从体表斜插进去的暗槽，避开大核 */
+  var ORAL = [62, 32, 112, 46];
+
+  function inOralGroove(x, y) {
+    var vx = ORAL[2] - ORAL[0], vy = ORAL[3] - ORAL[1];
+    var t = ((x - ORAL[0]) * vx + (y - ORAL[1]) * vy) / (vx * vx + vy * vy);
+    t = Math.max(0, Math.min(1, t));
+    var dx = x - (ORAL[0] + t * vx), dy = y - (ORAL[1] + t * vy);
+    return Math.sqrt(dx * dx + dy * dy) < 4.2;
+  }
+
+  /* 大核：一坨致密的椭圆，是画面上唯一"实"的地方 */
+  function inMacronucleus(x, y) {
+    var dx = (x - 94) / 22, dy = (y - 57) / 8.5;
+    return dx * dx + dy * dy <= 1;
+  }
+
+  /* 两端各一个伸缩泡，画成一个小圆圈 */
+  var VACUOLES = [[52, 34, 7], [144, 66, 7]];
+
+  function inVacuole(x, y) {
+    for (var i = 0; i < VACUOLES.length; i++) {
+      var v = VACUOLES[i], dx = x - v[0], dy = y - v[1];
+      var d = Math.sqrt(dx * dx + dy * dy);
+      if (d > v[2] - 2.2 && d < v[2] + 0.8) return true;
+    }
+    return false;
+  }
+
+  /* 一格被虫体盖住的高度比例：沿格子横向取几个点取最大值。
+     grow > 0 向外扩（找外圈纤毛），grow < 0 向内缩（单独描一条体表轮廓）。 */
+  function bodyCov(bx, by, cw, ch, dir, grow) {
+    var kx = 200 / cw, ky = 100 / ch;
+    var gx = dir > 0 ? cw - bx - CELL_W : bx;       /* 朝右游就整只水平翻过来 */
+    var lx0 = gx * kx, lx1 = (gx + CELL_W) * kx;
+    var ly0 = by * ky, ly1 = (by + CELL_H) * ky;
+    var band = ly1 - ly0, cov = 0;
+    for (var a = 0; a < 4; a++) {
+      var lx = lx0 + (a + 0.5) / 4 * (lx1 - lx0);
+      var s = (lx - HEAD_X) / BODY_LEN;
+      if (s < -0.05 || s > 1.05) continue;
+      var sc = s < 0 ? 0 : (s > 1 ? 1 : s);
+      var hw = halfWidth(sc);
+      /* 两端之外让宽度自然归零，纤毛却能继续向外绕一小圈 */
+      if (s > 1) hw = Math.max(0, hw - (s - 1) * BODY_LEN);
+      if (s < 0) hw = Math.max(0, hw + s * BODY_LEN);
+      var top = MID_Y - hw + groove(sc) - grow;
+      var bot = MID_Y + hw + grow;
+      var ov = Math.min(bot, ly1) - Math.max(top, ly0);
+      if (ov > 0 && ov / band > cov) cov = ov / band;
+    }
+    return cov;
+  }
+
+  function cellFrame(cols, rows, phase, dir) {
+    var cw = cols * CELL_W, ch = rows * CELL_H;
+    var c = document.createElement('canvas');
+    c.width = cw; c.height = ch;
+    var g = c.getContext('2d');
+
+    g.font = '600 ' + Math.round(CELL_H * 0.98) + 'px ui-monospace, "SF Mono", Menlo, Consolas, monospace';
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+
+    var kx = 200 / cw, ky = 100 / ch;
+
+    /* 字不跟着虫翻身：覆盖率在逻辑坐标里算，字符仍按正常方向落笔 */
+    for (var j = 0; j < rows; j++) {
+      for (var i = 0; i < cols; i++) {
+        var bx = i * CELL_W, by = j * CELL_H;
+        var body = bodyCov(bx, by, cw, ch, dir, 0);
+        var shell = bodyCov(bx, by, cw, ch, dir, 9);
+        if (body < 0.03 && shell < 0.03) continue;
+
+        var gx = dir > 0 ? cw - bx - CELL_W : bx;
+        var px = (gx + CELL_W / 2) * kx, py = (by + CELL_H / 2) * ky;
+        var s = (px - HEAD_X) / BODY_LEN;
+
+        var glyph, alpha;
+        if (body >= 0.03) {
+          /* 体表按"离边界多近"单独描一圈：只看半格以内，
+             内部才不会被一起涂黑，轮廓也不会断成一截一截 */
+          var sc = s < 0 ? 0 : (s > 1 ? 1 : s);
+          var dEdge = Math.min(
+            Math.abs(py - (MID_Y - halfWidth(sc) + groove(sc))),
+            Math.abs(py - (MID_Y + halfWidth(sc)))
+          );
+          var dEnd = Math.min(Math.abs(px - HEAD_X), Math.abs(px - (HEAD_X + BODY_LEN)));
+          if (body < 0.93 || dEdge < 4.2 || dEnd < 5) { glyph = '#'; alpha = 1; }   /* 体表：一圈实线 */
+          else if (inOralGroove(px, py)) { glyph = '='; alpha = 0.9; }
+          else if (inMacronucleus(px, py)) { glyph = '%'; alpha = 0.95; }
+          else if (inVacuole(px, py)) { glyph = 'o'; alpha = 0.95; }
+          else continue;                                   /* 细胞质留白，只留下结构 */
+        } else {
+          /* 纤毛：字符本身长短在变，一眼能看出"一片毛在划水" */
+          var wave = Math.sin(phase * 2 - s * 7.5 + (py < MID_Y ? 0 : Math.PI));
+          if (wave > 0.62) { glyph = '|'; alpha = 0.92; }
+          else if (wave > -0.15) { glyph = "'"; alpha = 0.8; }
+          else continue;                       /* 只留正在划的那一侧毛，别糊成一片 */
+        }
+
+        g.fillStyle = 'rgba(' + INK + ',' + alpha.toFixed(2) + ')';
+        g.fillText(glyph, bx + CELL_W / 2, by + CELL_H / 2);
+      }
+    }
+    return c;
+  }
+
+  var W = 0, H = 0, dpr = 1;
+  var sharks = [];
+  var running = false, raf = 0, lastT = 0, frameAt = 0;
+
+  function build() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cvs.clientWidth || window.innerWidth;
+    H = cvs.clientHeight || window.innerHeight;
+    cvs.width = Math.round(W * dpr);
+    cvs.height = Math.round(H * dpr);
+
+    /* 手机上演示页整屏铺满，背景本来也看不见，索性不画 */
+    if (W < 760) { sharks = []; cvs.style.display = 'none'; return; }
+    cvs.style.display = '';
+
+    /* 五只草履虫分三块水面漂：左下（说明文字下方）、右侧一条（手机右缘外），
+       左中那只压在最远的景深里，被纸色遮罩压得更淡。
+       尺寸、浓淡、速度都不相同——大的清楚、小的模糊，才有前后层次。 */
+    var config = [
+      { cols: 30, rows: 15, alpha: 0.72, speed: 6.0, dir: 1, y: 0.784, x0: 0.02, x1: 0.50, phase: 1.4 },
+      { cols: 22, rows: 12, alpha: 0.58, speed: -5.0, dir: -1, y: 0.045, x0: 0.60, x1: 0.99, phase: 3.1 },
+      { cols: 26, rows: 13, alpha: 0.44, speed: -4.0, dir: -1, y: 0.655, x0: 0.58, x1: 1.00, phase: 5.2 },
+      { cols: 20, rows: 10, alpha: 0.34, speed: 4.2, dir: 1, y: 0.315, x0: 0.64, x1: 0.99, phase: 0.7 },
+      { cols: 18, rows: 9, alpha: 0.42, speed: 4.4, dir: 1, y: 0.03, x0: 0.00, x1: 0.185, phase: 4.4 }
+    ];
+
+    sharks = config.map(function (cfg, idx) {
+      var frames = [];
+      for (var f = 0; f < PHASES; f++) {
+        frames.push(cellFrame(cfg.cols, cfg.rows, f / PHASES * Math.PI * 2, cfg.dir));
+      }
+      var w = frames[0].width, h = frames[0].height;
+      var span = Math.max(0, (cfg.x1 - cfg.x0) * W - w);
+      /* 纵向留出整条鱼的位置，别让尾巴或头被视口切掉 */
+      var y = Math.max(0, Math.min(H * cfg.y, H - h - 10));
+      return {
+        cfg: cfg, frames: frames, w: w, h: h,
+        x: Math.min(cfg.x0 * W + span * (0.35 + 0.3 * (idx % 3)), Math.max(0, W - w)),
+        y: y,
+        span: span
+      };
+    });
+  }
+
+  function draw(t) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    /* 每 84ms 换一帧，一片纤毛波扫完约 1s */
+    var fr = Math.floor(t / 84) % PHASES;
+    for (var i = 0; i < sharks.length; i++) {
+      var sh = sharks[i];
+      var bob = Math.sin(t * 0.00036 + sh.cfg.phase) * 6;
+      var tilt = Math.sin(t * 0.00024 + sh.cfg.phase * 1.7) * 0.055
+        + Math.sin(t * 0.00009 + sh.cfg.phase) * 0.035;
+
+      /* 进出巡游区时淡入淡出：露头到半身之间渐显，彻底出界时刚好归零，
+         于是回绕那一刻是全透明的，看不出跳变 */
+      var left = sh.cfg.x0 * W, right = sh.cfg.x1 * W - sh.w;
+      var soft = sh.w * 0.5 + 40;
+      var fade = right < left + 1 ? 1 : Math.min(
+        (sh.x - left + 40) / soft,
+        (right + 40 - sh.x) / soft
+      );
+      fade = Math.max(0, Math.min(1, fade));
+      if (fade <= 0.01) continue;
+
+      ctx.save();
+      ctx.globalAlpha = sh.cfg.alpha * fade;
+      ctx.translate(sh.x + sh.w / 2, sh.y + bob + sh.h / 2);
+      ctx.rotate(tilt);
+      ctx.drawImage(sh.frames[fr], -sh.w / 2, -sh.h / 2, sh.w, sh.h);
+      ctx.restore();
+    }
+  }
+
+  function step(now) {
+    if (!running) return;
+    raf = requestAnimationFrame(step);
+    if (document.hidden) return;
+    var dt = Math.min(now - lastT, 64);
+    if (now - frameAt < 32) return;   /* 约 30fps，背景不需要跑满 */
+    frameAt = now;
+    lastT = now;
+
+    for (var i = 0; i < sharks.length; i++) {
+      var sh = sharks[i];
+      sh.x += sh.cfg.speed * dt / 1000;
+      var left = sh.cfg.x0 * W, right = sh.cfg.x1 * W - sh.w;
+      if (right < left) right = left;
+      if (sh.x > right + 40) sh.x = left - 40;
+      if (sh.x < left - 40) sh.x = right + 40;
+    }
+    draw(now);
+  }
+
+  function start() {
+    if (running) return;
+    running = true;
+    lastT = frameAt = performance.now();
+    raf = requestAnimationFrame(step);
+  }
+  function stop() { running = false; cancelAnimationFrame(raf); }
+
+  build();
+  draw(performance.now());
+
+  /* 调试口：调形状时用，不影响正常渲染 */
+  window.__ocean = {
+    build: build,
+    sharks: function () { return sharks; },
+    frame: cellFrame,
+    coverage: bodyCov,
+    halfWidth: halfWidth,
+    groove: groove
+  };
+
+  if (!reduce) {
+    start();
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop(); else start();
+    });
+  }
+
+  var rt = 0;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      var wasRunning = running;
+      stop();
+      build();
+      draw(performance.now());
+      if (wasRunning) start();
+    }, 220);
+  });
+})();
+</script>
+
+<script>
+(function () {
+  var frame = document.getElementById('demo');
+  var boot = document.getElementById('boot');
+  var device = document.getElementById('device');
+  var now = document.getElementById('now');
+  var nowTag = document.getElementById('nowTag');
+  var nowTitle = document.getElementById('nowTitle');
+  var nowDesc = document.getElementById('nowDesc');
+  var nowMeta = document.getElementById('nowMeta');
+  var pulse = document.getElementById('nowPulse');
+  var sheet = document.getElementById('sheet');
+  var sheetBack = document.getElementById('sheetBack');
+  var shTag = document.getElementById('shTag');
+  var shTitle = document.getElementById('shTitle'), shDesc = document.getElementById('shDesc');
+  var trySheet = document.getElementById('trySheet');
+  var tryGrid = document.getElementById('tryGrid');
+  var tryList = document.getElementById('tryList');
+
+  /* 每个页面 / 浮层对应一段文案，key 与原型里的 id 或 screen 名一致 */
+  var COPY = {
+    home: { tag: '首页', title: '十本书，滑着挑',
+      desc: '最近看过的十本，漫画和小说混排。左右滑动换书，封面跟着抬起来。',
+      meta: ['最近 10 本', '横滑切换'] },
+    explore: { tag: '漫画', title: '漫画库 + 立体书架',
+      desc: '上层是能翻的立体书架，下层是本机漫画库，点封面直接读。',
+      meta: ['立体书架', '横向换书'] },
+    shelf: { tag: '小说', title: '小说：本机 + 轻小说文库',
+      desc: 'TXT、EPUB 导入即排；登录轻小说文库，就多一个书源。',
+      meta: ['本机导入', '轻小说文库'] },
+    read: { tag: '小说阅读', title: '五种翻页，跟着手指走',
+      desc: '卷页、平移、覆盖、淡入、无动画，都能拖着翻，松手落定。',
+      meta: ['5 种翻页', '跟手'] },
+    comic: { tag: '漫画阅读', title: '单页双页，顺手就翻',
+      desc: '点中间出进度和亮度，退出记住页码。',
+      meta: ['单页 / 双页', '记住页码'] },
+    me: { tag: '我的', title: '在读、读完、收藏',
+      desc: '翻到最后一页才算读完，统计只算真实进度。',
+      meta: ['阅读统计', '纸色主题'] },
+    src: { tag: '漫画图源', title: '图源：一次全开',
+      desc: '内置漫画图源随包带着，可单条启用，也能批量校验。',
+      meta: ['内置图源', '批量启用'] },
+    csearch: { tag: '搜图源', title: '多个源一起搜',
+      desc: '并发拉取，结果按来源分组，看中直接加入漫画库。',
+      meta: ['并发搜索', '按源分组'] },
+    nsrc: { tag: '小说书源', title: '书源：一键全部启用',
+      desc: '内置一百多个，点「全部启用」逐条跑通，失败原因写在列表里。',
+      meta: ['120+ 内置', '一键全开'] },
+    nssearch: { tag: '搜小说', title: '多源并搜，随时能停',
+      desc: '六路并发，边出结果边渲染，随时可以中止。',
+      meta: ['并发 6 路', '可中止'] },
+    pub: { tag: '公版书库', title: '断网也能读的公版书',
+      desc: '178 本随包带着，繁简互搜，下载后整本离线读。',
+      meta: ['178 本', '离线可读'] },
+    wk8: { tag: '轻小说文库', title: '登录一次，多一个书源',
+      desc: '登录后自动注册成书源，搜书、目录、正文走同一条链路。',
+      meta: ['站点内置', '登录即书源'] }
+  };
+
+  var current = '';
+  var booted = false;
+
+  function isOpen(el) {
+    if (!el) return false;
+    if (el.hidden) return false;
+    if (el.classList.contains('open')) {
+      var host = el.parentElement && el.parentElement.closest ? el.parentElement.closest('.screen') : null;
+      if (host && !host.classList.contains('active')) return false;
+      return true;
+    }
+    var w = el.ownerDocument && el.ownerDocument.defaultView;
+    if (!w) return false;
+    var s = w.getComputedStyle(el);
+    return s.display !== 'none' && s.visibility !== 'hidden';
+  }
+
+  function detect() {
+    var d = null;
+    try { d = frame.contentDocument; } catch (e) { return null; }
+    if (!d || !d.body) return null;
+
+    if (isOpen(d.getElementById('pubPage'))) return 'pub';
+    if (isOpen(d.getElementById('wk8Page'))) return 'wk8';
+    if (isOpen(d.getElementById('nsSrcPage'))) return 'nsrc';
+    if (isOpen(d.getElementById('nsSearchPage'))) return 'nssearch';
+    if (isOpen(d.getElementById('srcPage'))) return 'src';
+    if (isOpen(d.getElementById('searchPage'))) return 'csearch';
+
+    var act = d.querySelector('.screen.active');
+    if (!act) return null;
+    var name = act.id.replace(/^scr-/, '');
+    return COPY[name] ? name : 'home';
+  }
+
+  function apply(key) {
+    var c = COPY[key];
+    if (!c || key === current) return;
+    current = key;
+
+    shTag.textContent = c.tag;
+    shTitle.textContent = c.title;
+    shDesc.textContent = c.desc;
+
+    pulse.classList.remove('beat');
+    void pulse.offsetWidth;
+    pulse.classList.add('beat');
+
+    now.classList.add('out');
+    setTimeout(function () {
+      nowTag.textContent = c.tag;
+      nowTitle.textContent = c.title;
+      nowDesc.textContent = c.desc;
+      nowMeta.innerHTML = c.meta.map(function (m, i) {
+        return '<span' + (i === 0 ? ' class="hot"' : '') + '>' + m + '</span>';
+      }).join('');
+      now.classList.remove('out');
+    }, 170);
+  }
+
+  /* ── 试用入口：同源 iframe，直接调原型里的公开接口 ── */
+  function demoApi() {
+    try {
+      var w = frame.contentWindow;
+      if (w && w.SHIYE_DEMO) return w.SHIYE_DEMO;
+    } catch (e) { /* ignore */ }
+    return null;
+  }
+
+  /* 首页第一本固定为《干物妹》：在遮罩还没撤掉时重排，用户看不到重建 */
+  var pinnedHome = false;
+  function pinDemoHome() {
+    if (pinnedHome) return;
+    var api = demoApi();
+    if (!api || typeof api.pinHome !== 'function') return;
+    try { pinnedHome = api.pinHome('干物妹') === true; } catch (e) { /* ignore */ }
+  }
+
+  var TRY_LABEL = {
+    novel: '正在打开小说阅读…',
+    comic: '正在打开漫画阅读…',
+    home: '回到首页',
+    shelf: '打开小说库'
+  };
+
+  function markTrial(key) {
+    var all = document.querySelectorAll('[data-try]');
+    for (var i = 0; i < all.length; i++) {
+      all[i].classList.toggle('on', all[i].getAttribute('data-try') === key);
+    }
+  }
+
+  function land() {
+    device.classList.remove('landed');
+    void device.offsetWidth;
+    device.classList.add('landed');
+  }
+
+  function runTrial(key) {
+    var api = demoApi();
+    if (!api) {
+      flashToast('演示还在载入，稍等一下');
+      return;
+    }
+    closeAll();
+    if (key === 'home' || key === 'shelf') api.go(key);
+    else if (typeof api[key] === 'function') api[key]();
+    markTrial(key);
+    land();
+    setTimeout(function () { current = ''; var k = detect(); if (k) apply(k); }, 420);
+  }
+
+  /* 轻提示（只在本页，不打扰原型） */
+  var toastEl = null, toastTimer = 0;
+  function flashToast(text) {
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:60;' +
+        'background:rgba(46,43,38,.92);color:#FAF7EF;font-size:12.5px;padding:9px 14px;border-radius:8px;' +
+        'opacity:0;transition:opacity .2s ease;pointer-events:none;white-space:nowrap';
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = text;
+    toastEl.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.style.opacity = '0'; }, 1800);
+  }
+
+  function bindTrials(root) {
+    if (!root) return;
+    root.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-try]');
+      if (!b) return;
+      runTrial(b.getAttribute('data-try'));
+    });
+  }
+  bindTrials(tryGrid);
+  bindTrials(tryList);
+
+  /* ── 演示只留主要功能：藏掉图源 / 书源 / 导入 / 数据管理等次要入口 ── */
+  var TRIM_SEL = [
+    /* 漫画：在线图源与导入 */
+    '#comicSearchBtn', '#comicDiscoverBtn', '#comicFindBtn', '#comicSourceBtn',
+    '#comicFolderBtn', '#comicImportBtn',
+    '#scr-explore .comic-library-head .comic-tools', '#scr-explore .comic-import-tip',
+    /* 小说：书源、轻小说站点、导入与本机扫描 */
+    '#nsSrcBtn', '#nsSearchBtn', '#wk8Btn', '#importBtn', '#scanFolderBtn', '#demoImportBtn',
+    '#scr-shelf .novel-aux', '#scr-shelf .comic-import-tip',
+    /* 我的：缓存、书架管理、备份、关于、本机书库（与小说页重复）、震动反馈（桌面演示感受不到） */
+    '#meDownloads', '#meShelves', '#meBackup', '#meAbout', '#meLocal', '#meHomeVibe'
+  ].join(',');
+
+  function trimDemo(doc) {
+    try {
+      if (!doc || !doc.body || doc.__shiyeTrimmed) return;
+      doc.__shiyeTrimmed = true;
+      var hide = doc.querySelectorAll(TRIM_SEL);
+      for (var i = 0; i < hide.length; i++) hide[i].style.display = 'none';
+      /* 工具行整排都被藏掉时，把空壳也收起来 */
+      var rows = doc.querySelectorAll('.comic-tools');
+      for (var j = 0; j < rows.length; j++) {
+        var kids = rows[j].children, live = 0;
+        for (var k = 0; k < kids.length; k++) {
+          if (kids[k].tagName === 'SPAN') { kids[k].style.display = 'none'; continue; }
+          if (kids[k].style.display !== 'none') live++;
+        }
+        if (!live) rows[j].style.display = 'none';
+      }
+      /* 「我的」列表的最后一条要带到底，否则卡片底部会多一道悬空的分隔线 */
+      var lists = doc.querySelectorAll('.me-list');
+      for (var m = 0; m < lists.length; m++) {
+        var items = lists[m].children, tail = null;
+        for (var n = 0; n < items.length; n++) {
+          items[n].style.borderBottom = '';
+          if (items[n].style.display !== 'none' && !items[n].hidden) tail = items[n];
+        }
+        if (tail) tail.style.borderBottom = '0';
+      }
+    } catch (e) { /* 跨域或文档未就绪，下一轮再试 */ }
+  }
+
+  frame.addEventListener('load', function () {
+    try { pinDemoHome(); } catch (e) { /* ignore */ }
+    boot.classList.add('hide');
+    booted = true;
+    try { trimDemo(frame.contentDocument); } catch (e) { /* ignore */ }
+    var k = detect();
+    if (k) apply(k);
+  });
+  setTimeout(function () { boot.classList.add('hide'); }, 12000);
+
+  /* 原型是单页应用，没有可监听的路由事件，只能轻量轮询 */
+  setInterval(function () {
+    if (!booted) return;
+    try { pinDemoHome(); } catch (e) { /* ignore */ }
+    try { trimDemo(frame.contentDocument); } catch (e) { /* ignore */ }
+    var k = detect();
+    if (k) apply(k);
+  }, 320);
+
+  /* ── 两个面板（桌面：说明；移动：说明 + 试一试） ── */
+  var panel = null;
+  function openSheet(el) {
+    closeAll();
+    panel = el;
+    el.classList.add('open');
+    sheetBack.classList.add('open');
+  }
+  function closeAll() {
+    sheet.classList.remove('open');
+    trySheet.classList.remove('open');
+    sheetBack.classList.remove('open');
+    panel = null;
+  }
+  sheetBack.addEventListener('click', closeAll);
+  document.getElementById('shClose').addEventListener('click', closeAll);
+  document.getElementById('tryClose').addEventListener('click', closeAll);
+  document.getElementById('fabInfo').addEventListener('click', function () { openSheet(sheet); });
+  document.getElementById('fabTry').addEventListener('click', function () { openSheet(trySheet); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeAll();
+  });
+
+  window.__shiye = {
+    detect: detect,
+    current: function () { return current; },
+    isOpen: isOpen,
+    try: runTrial
+  };
+})();
+</script>
+</body>
+</html>
